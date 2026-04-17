@@ -5,7 +5,7 @@ import Footer from '../../components/Footer.astro';
 
 <Layout
   title="Senderos de la Costa — jota.systems"
-  description="Sistema de gestión a medida para Senderos de la Costa. Digitalización completa de procesos administrativos y operativos."
+  description="Plataforma web para una constructora. Sitio corporativo + sistema interno que administra presupuestos, clientes, empleados, obras y finanzas."
   showSidebar={false}
 >
   <article class="case-detail">
@@ -13,113 +13,93 @@ import Footer from '../../components/Footer.astro';
       <a href="/#proyectos" class="back-link">← Volver al inicio</a>
 
       <header class="case-header">
-        <p class="eyebrow">Caso 01 · 2025 · Sistema de Gestión</p>
+        <p class="eyebrow">Sitio + Sistema de Gestión</p>
         <h1>Senderos de la Costa</h1>
         <p class="case-intro">
-          Sistema de gestión integral construido a medida para ordenar y automatizar los procesos administrativos y operativos del negocio.
+          Plataforma web para una constructora. Sitio corporativo público + sistema interno de <span class="text-primary">6 módulos</span>.
         </p>
         <div class="case-actions">
-          <a href="#demo" class="btn btn-solid">🎮 Probar demo en vivo</a>
-          <a href="#" target="_blank" rel="noopener" class="btn">Sitio en vivo ↗</a>
+          <a href="https://web-senderos-de-la-costa.vercel.app" target="_blank" rel="noopener" class="btn btn-solid">Ver sitio en vivo ↗</a>
         </div>
       </header>
 
-      <div class="quick-info">
-        <div>
-          <span class="label">Cliente</span>
-          <strong>Senderos de la Costa</strong>
-        </div>
-        <div>
-          <span class="label">Año</span>
-          <strong>2025</strong>
-        </div>
-        <div>
-          <span class="label">Duración</span>
-          <strong>[Completar]</strong>
-        </div>
-        <div>
-          <span class="label">Estado</span>
-          <strong class="active">● En producción</strong>
-        </div>
-      </div>
-
-      <section class="content-section">
-        <h2>El Desafío</h2>
+      <section class="block" id="que-es">
+        <h2>Qué es</h2>
         <p>
-          [Acá describimos el problema real que tenía el cliente antes. Ejemplo: "Senderos de la Costa manejaba toda su operación con planillas de Excel y anotaciones en papel. Esto generaba errores frecuentes, duplicación de datos y mucho tiempo perdido en tareas administrativas que podían automatizarse."]
+          Sitio corporativo de una constructora con un panel interno que centraliza toda la operación administrativa y financiera.
+        </p>
+        <p>
+          Una sola fuente de verdad para presupuestos, clientes, empleados y obras — todo conectado entre sí y accesible en tiempo real desde cualquier dispositivo, con usuario y contraseña.
+        </p>
+        <p>
+          Pensado para constructoras chicas o medianas que manejan varias obras en paralelo y necesitan tener visibilidad completa del estado del negocio en cualquier momento.
         </p>
       </section>
 
-      <section class="content-section">
-        <h2>La Solución</h2>
-        <p>
-          [Acá contamos qué construiste. Ejemplo: "Diseñé un sistema de gestión web a medida con panel administrativo, gestión de clientes, inventario y reportes automáticos. El sistema corre en un servidor propio con acceso remoto 24/7."]
+      <section class="block" id="incluye">
+        <h2>Incluye</h2>
+        <ul class="modules-list">
+          <li>
+            <span class="mod-num">01</span>
+            <div>
+              <strong>Presupuestos</strong>
+              <span>Cotización de obras con exportación a PDF.</span>
+            </div>
+          </li>
+          <li>
+            <span class="mod-num">02</span>
+            <div>
+              <strong>Clientes</strong>
+              <span>Ficha con historial de presupuestos, obras y saldo.</span>
+            </div>
+          </li>
+          <li>
+            <span class="mod-num">03</span>
+            <div>
+              <strong>Empleados</strong>
+              <span>Personal, asignación a obras y control de horas.</span>
+            </div>
+          </li>
+          <li>
+            <span class="mod-num">04</span>
+            <div>
+              <strong>Obras</strong>
+              <span>Seguimiento de cada obra: cliente, equipo, fechas, estado.</span>
+            </div>
+          </li>
+          <li>
+            <span class="mod-num">05</span>
+            <div>
+              <strong>Finanzas</strong>
+              <span>Ingresos, egresos, cuentas por cobrar y reportes.</span>
+            </div>
+          </li>
+          <li>
+            <span class="mod-num">06</span>
+            <div>
+              <strong>Sitio corporativo</strong>
+              <span>Landing con servicios, obras y contacto.</span>
+            </div>
+          </li>
+        </ul>
+        <p class="benefits-line">
+          <span class="arrow">→</span> Operación centralizada, acceso remoto, presupuestos con marca propia, histórico auditable.
         </p>
+      </section>
 
-        <h4 class="sub-title">Funcionalidades principales</h4>
-        <ul class="feature-list">
-          <li><strong>Panel administrativo</strong> con vista general del negocio en tiempo real.</li>
-          <li><strong>Gestión de clientes</strong> con historial, contactos y datos relevantes.</li>
-          <li><strong>Sistema de reportes</strong> exportables a PDF y Excel.</li>
-          <li><strong>Roles y permisos</strong> diferenciados para admin y operarios.</li>
-          <li><strong>Backups automáticos</strong> diarios con retención de 30 días.</li>
+      <section class="block" id="stack">
+        <h2>Stack técnico</h2>
+        <ul class="tech-tags">
+          <li>Angular</li>
+          <li>Node.js</li>
+          <li>Express</li>
+          <li>Supabase (DB + Auth)</li>
+          <li>Vercel</li>
         </ul>
       </section>
 
-      <section class="content-section">
-        <h2>Stack Técnico</h2>
-        <ul class="tech-stack">
-          <li><span class="tech-num">01</span><div><strong>Angular</strong><span>Frontend framework</span></div></li>
-          <li><span class="tech-num">02</span><div><strong>Node.js / Express</strong><span>Backend API</span></div></li>
-          <li><span class="tech-num">03</span><div><strong>PostgreSQL</strong><span>Base de datos relacional</span></div></li>
-          <li><span class="tech-num">04</span><div><strong>Docker</strong><span>Deploy & entorno</span></div></li>
-          <li><span class="tech-num">05</span><div><strong>JWT</strong><span>Autenticación y seguridad</span></div></li>
-        </ul>
-      </section>
-
-      <section class="content-section results-section">
-        <h2>Resultados</h2>
-        <div class="results-grid">
-          <div class="result">
-            <strong>−70%</strong>
-            <p>Reducción del tiempo en tareas administrativas manuales.</p>
-          </div>
-          <div class="result">
-            <strong>100%</strong>
-            <p>Procesos operativos digitalizados y centralizados.</p>
-          </div>
-          <div class="result">
-            <strong>24/7</strong>
-            <p>Acceso remoto seguro desde cualquier dispositivo.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="demo" class="content-section demo-section">
-        <h2>Demo en Vivo</h2>
-        <p>
-          Accedé a una instancia de demostración con datos ficticios realistas. Podés explorar el panel, crear registros, ver reportes y experimentar la experiencia real del sistema.
-        </p>
-
-        <div class="demo-card">
-          <div class="demo-creds">
-            <div class="cred">
-              <span class="label">Usuario</span>
-              <code>demo@senderos.com</code>
-            </div>
-            <div class="cred">
-              <span class="label">Contraseña</span>
-              <code>demo2026</code>
-            </div>
-          </div>
-          <a href="#" class="btn btn-solid" target="_blank">Abrir demo →</a>
-          <p class="demo-note">⚠ Los datos se resetean automáticamente cada 24hs. No ingreses información real.</p>
-        </div>
-      </section>
-
-      <section class="content-section cta-section">
+      <section class="block cta-section">
         <h3>¿Querés algo similar para tu negocio?</h3>
-        <p>Contame qué necesitás y armamos una propuesta a medida.</p>
         <a href="/#contacto" class="btn btn-solid">Contactame</a>
       </section>
 
@@ -130,11 +110,10 @@ import Footer from '../../components/Footer.astro';
 
 <style>
   .case-detail {
-    max-width: 900px;
+    max-width: 780px;
     margin: 0 auto;
-    padding: 3rem 0 0;
+    padding: 2.5rem 0 0;
     color: var(--text-secondary);
-    grid-column: 1 / -1;
   }
 
   .case-page {
@@ -143,7 +122,7 @@ import Footer from '../../components/Footer.astro';
 
   .back-link {
     display: inline-block;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     font-family: var(--font-mono);
     font-size: 0.85rem;
     color: var(--accent);
@@ -152,9 +131,10 @@ import Footer from '../../components/Footer.astro';
 
   .back-link:hover { color: var(--accent-hover); }
 
+  /* HEADER */
   .case-header {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--border);
   }
 
@@ -164,19 +144,20 @@ import Footer from '../../components/Footer.astro';
     color: var(--accent);
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
 
   .case-header h1 {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: clamp(2.25rem, 4vw, 3rem);
   }
 
   .case-intro {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 2rem;
-    max-width: 720px;
+    line-height: 1.55;
+    margin-bottom: 1.5rem;
+    max-width: 680px;
   }
 
   .case-actions {
@@ -185,216 +166,121 @@ import Footer from '../../components/Footer.astro';
     flex-wrap: wrap;
   }
 
-  /* Quick info */
-  .quick-info {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    padding: 1.5rem;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 3rem;
+  /* BLOCKS */
+  .block {
+    margin-bottom: 0.5rem;
   }
 
-  .quick-info .label {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-bottom: 0.35rem;
+  .block h2 {
+    margin-bottom: 0.5rem;
+    margin-top: 0;
   }
 
-  .quick-info strong {
-    font-size: 0.95rem;
-    color: var(--text-primary);
-    font-weight: 600;
-  }
-
-  .quick-info .active { color: #10b981; }
-
-  /* Content sections */
-  .content-section {
-    margin-bottom: 3rem;
-  }
-
-  .content-section p {
+  .block p {
     font-size: 1rem;
     color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 1rem;
+    line-height: 1.55;
+    margin-bottom: 0;
   }
 
-  .sub-title {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
+  .block p + p {
+    margin-top: 0.5rem;
   }
 
-  .feature-list {
+  /* MODULES LIST */
+  .modules-list {
     list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--border);
+    margin-bottom: 1.25rem;
   }
 
-  .feature-list li {
-    position: relative;
-    padding: 0.75rem 0 0.75rem 1.75rem;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-  }
-
-  .feature-list li::before {
-    content: '▹';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    top: 0.85rem;
-  }
-
-  .feature-list li strong { color: var(--text-primary); }
-
-  /* Tech stack */
-  .tech-stack {
-    list-style: none;
-  }
-
-  .tech-stack li {
+  .modules-list li {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 1rem;
-    padding: 1rem 0;
+    padding: 0.85rem 0;
     border-bottom: 1px solid var(--border);
-    align-items: center;
+    align-items: baseline;
   }
 
-  .tech-num {
+  .mod-num {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--accent);
     font-weight: 600;
   }
 
-  .tech-stack strong {
-    display: block;
+  .modules-list strong {
+    display: inline;
     color: var(--text-primary);
     font-size: 1rem;
     font-weight: 600;
-    margin-bottom: 0.2rem;
+    margin-right: 0.5rem;
   }
 
-  .tech-stack span {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--text-muted);
+  .modules-list span {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 
-  /* Results */
-  .results-section h2::after { max-width: 100px; }
-
-  .results-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .result {
-    padding: 1.5rem;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    border-radius: 8px;
-  }
-
-  .result strong {
-    display: block;
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--accent);
-    line-height: 1;
-    margin-bottom: 0.75rem;
-    letter-spacing: -0.02em;
-  }
-
-  .result p {
-    font-size: 0.85rem;
+  /* BENEFITS LINE (compacted) */
+  .benefits-line {
+    font-size: 0.95rem;
     color: var(--text-secondary);
     line-height: 1.5;
-    margin: 0;
-  }
-
-  /* Demo */
-  .demo-card {
-    padding: 2rem;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-top: 1.5rem;
-  }
-
-  .demo-creds {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .cred {
-    padding: 1rem;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-  }
-
-  .cred .label {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-bottom: 0.4rem;
-  }
-
-  .cred code {
-    color: var(--accent);
-    background: none;
-    padding: 0;
-    font-size: 0.9rem;
-  }
-
-  .demo-note {
+    padding: 0.85rem 1rem;
+    background: var(--accent-dim);
+    border-radius: 6px;
+    border-left: 2px solid var(--accent);
     margin-top: 1rem;
-    font-size: 0.75rem;
-    color: var(--text-muted);
+  }
+
+  .benefits-line .arrow {
+    color: var(--accent);
+    font-weight: 700;
+    margin-right: 0.25rem;
+  }
+
+  /* TECH TAGS */
+  .tech-tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .tech-tags li {
     font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 999px;
+    font-weight: 500;
   }
 
   /* CTA */
   .cta-section {
     text-align: center;
-    padding: 3rem 2rem;
+    padding: 2rem 1.5rem;
     background: var(--bg-panel);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-top: 4rem;
+    border-radius: 10px;
+    margin-top: 2.5rem;
   }
 
   .cta-section h3 {
-    font-size: 1.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .cta-section p {
-    margin-bottom: 1.5rem;
-    max-width: none;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
   }
 
   @media (max-width: 768px) {
-    .quick-info { grid-template-columns: repeat(2, 1fr); }
-    .results-grid { grid-template-columns: 1fr; }
-    .demo-creds { grid-template-columns: 1fr; }
+    .case-page { padding: 0 1.25rem; }
     .case-header h1 { font-size: 2rem; }
+    .modules-list li { grid-template-columns: auto 1fr; }
   }
 </style>

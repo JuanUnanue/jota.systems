@@ -20,7 +20,15 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="theme-color" content="#B8530F" />
+
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -28,10 +36,10 @@ const {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://jota.systems" />
+    <meta property="og:url" content="https://jotasystems.com.ar" />
   </head>
   <body>
-    <div class="site-wrapper">
+    <div class:list={['site-wrapper', { 'no-sidebar': !showSidebar }]}>
       {showSidebar && <Sidebar />}
       <main>
         <slot />
@@ -45,9 +53,9 @@ const {
         document.body.style.setProperty('--mouse-y', e.clientY + 'px');
       });
 
-      // Scroll spy para la nav del sidebar
+      // Scroll spy para la nav del sidebar y TOCs internos
       const sections = document.querySelectorAll('section[id]');
-      const navLinks = document.querySelectorAll('.sidebar-nav a');
+      const navLinks = document.querySelectorAll('.sidebar-nav a, .toc a');
 
       const observerOptions = {
         rootMargin: '-30% 0px -60% 0px',

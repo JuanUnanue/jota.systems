@@ -71,6 +71,12 @@ body {
       var(--bg) 100%
     );
   }
+
+  /* En páginas sin sidebar (páginas de detalle de proyectos),
+     el fondo es uniforme, sin división visual. */
+  body:has(.site-wrapper.no-sidebar) {
+    background: var(--bg);
+  }
 }
 
 /* Cursor glow (sutil) */
@@ -256,6 +262,13 @@ code {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6rem;
+}
+
+/* En páginas sin sidebar (ej. páginas de detalle de proyectos),
+   el contenido ocupa todo el ancho en vez de la mitad izquierda */
+.site-wrapper.no-sidebar {
+  grid-template-columns: 1fr;
+  gap: 0;
 }
 
 section {
