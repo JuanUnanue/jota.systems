@@ -1,0 +1,102 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="Página no encontrada — jota.systems"
+  description="La página que buscás no existe. Volvé al inicio para seguir navegando."
+  showSidebar={false}
+>
+  <div class="notfound">
+    <div class="notfound-inner">
+      <p class="eyebrow">Error 404</p>
+      <h1>Esta página <span class="thin">no está</span> en el mapa.</h1>
+      <p class="lead">
+        El link que seguiste puede estar roto, la página se movió, o simplemente nunca existió. Perdón por el paseo en vano.
+      </p>
+      <div class="actions">
+        <a href="/" class="btn btn-solid">← Volver al inicio</a>
+        <a href="/#proyectos" class="btn">Ver proyectos</a>
+      </div>
+
+      <div class="bottom-meta">
+        <p>¿Buscabas algo específico? <a href="/#contacto" class="link-inline">Escribime</a> y lo encontramos juntos.</p>
+      </div>
+    </div>
+
+    <Footer />
+  </div>
+</Layout>
+
+<style>
+  .notfound {
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 0;
+  }
+
+  .notfound-inner {
+    padding-bottom: 3rem;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  h1 .thin {
+    font-weight: 300;
+    color: var(--text-secondary);
+  }
+
+  .lead {
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 560px;
+    margin-bottom: 2.5rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+
+  .bottom-meta {
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .bottom-meta p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .notfound { padding: 3rem 1.25rem 0; }
+    h1 { font-size: 2.25rem; }
+    .lead { font-size: 1rem; }
+  }
+</style>
