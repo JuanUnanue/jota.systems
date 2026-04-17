@@ -160,6 +160,16 @@ p {
   margin-bottom: 1rem;
 }
 
+/* Texto justificado con guiones automáticos en bloques de texto largo */
+.about-content p,
+.block p,
+.contact-content p {
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
 a {
   color: var(--accent);
   text-decoration: none;
