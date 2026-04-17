@@ -1,0 +1,168 @@
+---
+const services = [
+  {
+    period: 'Servicio 01',
+    title: 'Sitios Web',
+    company: 'Landings, sitios corporativos, catálogos',
+    description: 'Sitios web rápidos, responsivos y optimizados para convertir visitantes en clientes. Diseño a medida, performance garantizada.',
+    tags: ['SEO técnico', 'Diseño custom', 'Hosting incluido', 'Performance 90+']
+  },
+  {
+    period: 'Servicio 02',
+    title: 'Sistemas de Gestión',
+    company: 'Aplicaciones web a medida',
+    description: 'Sistemas para administrar clientes, inventario, reservas, facturación y todo lo que tu negocio necesite. Con panel admin, roles y reportes.',
+    tags: ['Panel admin', 'Base de datos', 'Roles y permisos', 'Reportes']
+  },
+  {
+    period: 'Servicio 03',
+    title: 'Mantenimiento',
+    company: 'Acompañamiento mensual',
+    description: 'Updates, fixes y mejoras continuas para que tu sitio o sistema siga creciendo con tu negocio. Respuesta rápida, sin letra chica.',
+    tags: ['Monitoreo 24/7', 'Backups diarios', 'Nuevas features', 'Soporte directo']
+  },
+];
+---
+
+<section id="servicios" class="services">
+  <h2>Servicios</h2>
+  <div class="services-list">
+    {services.map((service) => (
+      <article class="service-item">
+        <div class="period-col">
+          <span class="period">{service.period}</span>
+        </div>
+        <div class="content-col">
+          <h3>
+            <span>{service.title}</span>
+            <span class="arrow">↗</span>
+          </h3>
+          <p class="company">{service.company}</p>
+          <p class="description">{service.description}</p>
+          <ul class="tags">
+            {service.tags.map((tag) => <li>{tag}</li>)}
+          </ul>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .services-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .service-item {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem 1rem;
+    margin: 0 -1rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: all var(--transition);
+    position: relative;
+  }
+
+  /* Focus on hover: al hover sobre la lista, los items no-hovered se difuminan */
+  @media (hover: hover) {
+    .services-list:hover .service-item:not(:hover) {
+      opacity: 0.2;
+    }
+  }
+
+  .service-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background: transparent;
+    transition: background var(--transition);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .service-item:hover::before {
+    background: var(--bg-panel);
+  }
+
+  .service-item:hover {
+    border-color: var(--border);
+  }
+
+  .service-item:hover h3 > span:first-child {
+    color: var(--accent);
+  }
+
+  .service-item:hover .arrow {
+    transform: translate(2px, -2px);
+    color: var(--accent);
+  }
+
+  .period {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    padding-top: 0.2rem;
+  }
+
+  .content-col h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color var(--transition);
+  }
+
+  .arrow {
+    display: inline-block;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    transition: all var(--transition);
+  }
+
+  .company {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tags li {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  @media (max-width: 640px) {
+    .service-item { grid-template-columns: 1fr; gap: 0.5rem; }
+    .period-col { margin-bottom: 0.25rem; }
+  }
+</style>

@@ -1,0 +1,26 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <p>
+    Hecho a mano con <span class="accent">Astro</span> y código propio. Tipografía: <span class="accent">Inter</span> + <span class="accent">JetBrains Mono</span>.
+  </p>
+  <p>&copy; {year} Juan Unanue · jota.systems</p>
+</footer>
+
+<style>
+  .site-footer {
+    padding: 4rem 0 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .site-footer p { margin-bottom: 0.3rem; color: var(--text-muted); }
+
+  .accent {
+    color: var(--accent);
+  }
+</style>

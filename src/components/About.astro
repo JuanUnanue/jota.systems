@@ -1,0 +1,70 @@
+---
+---
+
+<section id="sobre-mi" class="about">
+  <h2>Sobre mí</h2>
+  <div class="about-content">
+    <p>
+      Soy <span class="text-primary">Juan Unanue</span>, desarrollador web independiente trabajando desde Argentina bajo el nombre de <a href="/" class="link-inline">jota.systems</a>. Construyo sitios web y sistemas de gestión a medida para negocios que quieren operar mejor y crecer en serio.
+    </p>
+    <p>
+      Mi enfoque es simple: nada de plantillas genéricas, nada de atajos. Cada proyecto lo encaro como si fuera el mío — con tiempo, criterio y compromiso post-entrega real. Me interesa menos la última tecnología de moda y más resolver el <span class="text-primary">problema concreto</span> que tiene el cliente.
+    </p>
+    <p>
+      Actualmente tengo <span class="text-primary">dos sistemas en producción</span> ayudando a sus dueños todos los días: <a href="/proyectos/senderos-de-la-costa" class="link-inline">Senderos de la Costa</a> (sistema de gestión integral) y <a href="/proyectos/alojamiento-calma" class="link-inline">Alojamiento Calma</a> (sitio web con alta conversión).
+    </p>
+    <p>
+      Cuando no estoy escribiendo código, estoy leyendo sobre productos, ingeniería, o aprendiendo algo nuevo que pueda aplicar en el próximo proyecto.
+    </p>
+
+    <h4 class="stack-title">Tecnologías con las que trabajo:</h4>
+    <ul class="stack-grid">
+      <li>JavaScript (ES6+)</li>
+      <li>TypeScript</li>
+      <li>Angular</li>
+      <li>Node.js</li>
+      <li>PostgreSQL</li>
+      <li>Docker</li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .about { }
+
+  .about-content p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.7;
+  }
+
+  .stack-title {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(140px, 200px));
+    gap: 0.3rem 1rem;
+    list-style: none;
+  }
+
+  .stack-grid li {
+    position: relative;
+    padding-left: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .stack-grid li::before {
+    content: '▹';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 0.9rem;
+    top: 0;
+  }
+</style>

@@ -1,0 +1,291 @@
+/* =========================================================
+   JOTA.SYSTEMS — Global styles
+   Estilo: Brittany Chiang layout · paleta beige/cálida
+   Fuentes: Inter (display) + JetBrains Mono (code)
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Paleta cálida — Light mode crema */
+  --bg: #F5EFE6;
+  --bg-alt: #EDE5D3;
+  --bg-panel: #FFFFFF;
+  --bg-panel-hover: #FAF5EB;
+
+  --text-primary: #2A1D12;
+  --text-secondary: #5C4A38;
+  --text-muted: #8A7A5F;
+  --text-dim: #B0A084;
+
+  --accent: #B8530F;
+  --accent-hover: #8F3F0B;
+  --accent-dim: rgba(184, 83, 15, 0.08);
+
+  --border: rgba(42, 29, 18, 0.12);
+  --border-strong: rgba(42, 29, 18, 0.25);
+
+  /* Tipografía */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Layout */
+  --max-width: 1280px;
+  --sidebar-width: 44%;
+  --content-width: 56%;
+
+  /* Transiciones */
+  --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 16px;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* En desktop: pintar la mitad izquierda (sidebar zone) un tono más oscuro */
+@media (min-width: 1025px) {
+  body {
+    background: linear-gradient(
+      to right,
+      var(--bg-alt) 0%,
+      var(--bg-alt) 50%,
+      var(--bg) 50%,
+      var(--bg) 100%
+    );
+  }
+}
+
+/* Cursor glow (sutil) */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(184, 83, 15, 0.22),
+    transparent 55%
+  );
+  transition: background 0.15s ease;
+}
+
+main, aside, header, footer {
+  position: relative;
+  z-index: 2;
+}
+
+/* =========================================================
+   TIPOGRAFÍA
+   ========================================================= */
+
+h1, h2, h3, h4 {
+  color: var(--text-primary);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: clamp(2.75rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+h2::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  max-width: 200px;
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+h4 {
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+}
+
+p {
+  color: var(--text-secondary);
+  font-weight: 400;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+a:hover { color: var(--accent-hover); }
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--accent);
+}
+
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+
+.text-accent { color: var(--accent); }
+.text-primary { color: var(--text-primary); }
+.text-muted { color: var(--text-muted); }
+
+/* Links inline con underline sutil */
+.link-inline {
+  color: var(--accent);
+  position: relative;
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--border-strong);
+  transition: border-color var(--transition);
+}
+
+.link-inline:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* Botones */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all var(--transition);
+}
+
+.btn:hover {
+  background: var(--accent-dim);
+  color: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+.btn-solid {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.btn-solid:hover {
+  background: var(--accent-hover);
+  color: var(--bg);
+}
+
+/* Tech pill */
+.tech-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   LAYOUT — 2 COLUMNAS (sidebar + main)
+   ========================================================= */
+
+.site-wrapper {
+  max-width: var(--max-width);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6rem;
+}
+
+section {
+  padding: 5rem 0;
+  scroll-margin-top: 2rem;
+}
+
+section:first-child {
+  padding-top: 6rem;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1024px) {
+  .site-wrapper {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    padding: 0 1.5rem;
+  }
+
+  section { padding: 3rem 0; }
+  section:first-child { padding-top: 4rem; }
+
+  h1 { font-size: 2.5rem; }
+  h2::after { max-width: 100px; }
+}
+
+@media (max-width: 640px) {
+  .site-wrapper { padding: 0 1rem; }
+  h1 { font-size: 2.25rem; }
+}

@@ -1,0 +1,74 @@
+---
+import Sidebar from '../components/Sidebar.astro';
+import '../styles/global.css';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  showSidebar?: boolean;
+}
+
+const {
+  title = 'Juan Unanue — jota.systems',
+  description = 'Juan Unanue. Desarrollador independiente. Construyo sitios web y sistemas de gestión a medida para negocios que quieren crecer en serio.',
+  showSidebar = true,
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://jota.systems" />
+  </head>
+  <body>
+    <div class="site-wrapper">
+      {showSidebar && <Sidebar />}
+      <main>
+        <slot />
+      </main>
+    </div>
+
+    <script>
+      // Cursor glow effect
+      document.addEventListener('mousemove', (e) => {
+        document.body.style.setProperty('--mouse-x', e.clientX + 'px');
+        document.body.style.setProperty('--mouse-y', e.clientY + 'px');
+      });
+
+      // Scroll spy para la nav del sidebar
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+      const observerOptions = {
+        rootMargin: '-30% 0px -60% 0px',
+        threshold: 0,
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id');
+            navLinks.forEach((link) => {
+              link.classList.remove('active');
+              if (link.getAttribute('href') === `#${id}`) {
+                link.classList.add('active');
+              }
+            });
+          }
+        });
+      }, observerOptions);
+
+      sections.forEach((section) => observer.observe(section));
+    </script>
+  </body>
+</html>
