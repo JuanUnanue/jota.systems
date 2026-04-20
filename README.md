@@ -1,8 +1,8 @@
-# jota.systems — Portfolio
+# Codemar — Portfolio
 
 Portfolio personal de **Juan Unanue** — desarrollo web y sistemas de gestión.
 
-Estudio: **jota.systems**
+Estudio: **Codemar**
 Estilo visual: Brittany Chiang style · paleta beige/cálida
 Layout: Sidebar fijo + contenido scrolleable
 
@@ -118,4 +118,4 @@ Los archivos `Hero.astro` y `Header.astro` quedaron del diseño anterior y no se
 - [ ] Agregar screenshots reales en `public/images/`
 - [ ] Implementar demo de Senderos (cuenta invitado)
 - [ ] Conectar formulario a Formspree
-- [ ] Comprar dominio `jota.systems` y configurar DNS
+- [ ] Comprar dominio `codemar.com.ar` y configurar DNS
