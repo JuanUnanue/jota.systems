@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="256" height="256">
+  <!-- Sin fondo: usar sobre cualquier color -->
+
+  <!-- Prompt > -->
+  <path d="M 14 30 L 22 40 L 14 50"
+    stroke="#B8530F"
+    stroke-width="4"
+    fill="none"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+
+  <!-- Monograma CM -->
+  <text x="46" y="48"
+    text-anchor="middle"
+    font-family="'JetBrains Mono', 'Courier New', monospace"
+    font-weight="700"
+    font-size="22"
+    fill="#B8530F"
+    letter-spacing="1">CM</text>
+
+  <!-- Cursor parpadeante -->
+  <rect x="64" y="32" width="4" height="18" fill="#B8530F">
+    <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;0.5;0.5;1;1" dur="1s" repeatCount="indefinite"/>
+  </rect>
+</svg>

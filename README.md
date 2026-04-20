@@ -1,8 +1,8 @@
-# Codemar — Portfolio
+# CodeMar — Portfolio
 
 Portfolio personal de **Juan Unanue** — desarrollo web y sistemas de gestión.
 
-Estudio: **Codemar**
+Estudio: **CodeMar**
 Estilo visual: Brittany Chiang style · paleta beige/cálida
 Layout: Sidebar fijo + contenido scrolleable
 

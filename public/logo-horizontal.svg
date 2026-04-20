@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="640" height="160">
+  <!-- Logo compacto a la izquierda -->
+
+  <!-- Prompt > -->
+  <path d="M 14 30 L 22 40 L 14 50"
+    stroke="#B8530F"
+    stroke-width="4"
+    fill="none"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+
+  <!-- Monograma CM -->
+  <text x="46" y="48"
+    text-anchor="middle"
+    font-family="'JetBrains Mono', 'Courier New', monospace"
+    font-weight="700"
+    font-size="22"
+    fill="#B8530F"
+    letter-spacing="1">CM</text>
+
+  <!-- Cursor parpadeante -->
+  <rect x="64" y="32" width="4" height="18" fill="#B8530F">
+    <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;0.5;0.5;1;1" dur="1s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Divisor sutil -->
+  <line x1="88" y1="28" x2="88" y2="52"
+    stroke="#B8530F"
+    stroke-width="1"
+    opacity="0.3"/>
+
+  <!-- Wordmark "CodeMar" -->
+  <text x="102" y="48"
+    font-family="'Inter', sans-serif"
+    font-weight="800"
+    font-size="28"
+    fill="#2A1D12"
+    letter-spacing="-0.02em">Code<tspan fill="#B8530F">Mar</tspan></text>
+</svg>
