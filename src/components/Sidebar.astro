@@ -12,7 +12,7 @@ const navItems = [
       <a href="/" class="brand-link">
         <img src="/logo-main.svg" alt="CodeMar" class="brand-logo" />
         <div class="brand-text">
-          <h1 class="brand-title">CodeMar</h1>
+          <h1 class="brand-title">Code<span class="accent">Mar</span></h1>
           <p class="title">Desarrollador web & sistemas</p>
           <p class="intro">
             Construyo sitios y sistemas a medida para negocios que quieren operar mejor.
@@ -114,6 +114,10 @@ const navItems = [
     letter-spacing: -0.03em;
     margin: 0;
     transition: color var(--transition);
+  }
+
+  .brand-title .accent {
+    color: var(--accent);
   }
 
   .brand-link:hover .brand-title {
