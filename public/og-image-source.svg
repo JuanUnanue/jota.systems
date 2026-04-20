@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <!-- Fondo crema -->
+  <rect width="1200" height="630" fill="#F5EFE6"/>
+
+  <!-- Patrón decorativo: prompts distribuidos -->
+  <g opacity="0.08" fill="#B8530F">
+    <text x="80" y="80" font-family="'JetBrains Mono', monospace" font-size="22">&gt; _</text>
+    <text x="1020" y="120" font-family="'JetBrains Mono', monospace" font-size="22">&gt; _</text>
+    <text x="150" y="540" font-family="'JetBrains Mono', monospace" font-size="22">&gt; _</text>
+    <text x="1080" y="500" font-family="'JetBrains Mono', monospace" font-size="22">&gt; _</text>
+    <text x="90" y="300" font-family="'JetBrains Mono', monospace" font-size="22">&gt; _</text>
+    <text x="1100" y="310" font-family="'JetBrains Mono', monospace" font-size="22">&gt; _</text>
+  </g>
+
+  <!-- Logo terminal centrado arriba -->
+  <g transform="translate(480, 150)">
+    <!-- Prompt > -->
+    <path d="M 12 30 L 38 60 L 12 90"
+      stroke="#B8530F"
+      stroke-width="9"
+      fill="none"
+      stroke-linecap="round"
+      stroke-linejoin="round"/>
+
+    <!-- CM -->
+    <text x="60" y="82"
+      font-family="'JetBrains Mono', 'Courier New', monospace"
+      font-weight="700"
+      font-size="72"
+      fill="#B8530F"
+      letter-spacing="2">CM</text>
+
+    <!-- Cursor -->
+    <rect x="215" y="38" width="12" height="56" fill="#B8530F"/>
+  </g>
+
+  <!-- Wordmark centrado -->
+  <text x="600" y="370"
+    text-anchor="middle"
+    font-family="'Inter', sans-serif"
+    font-weight="800"
+    font-size="96"
+    fill="#2A1D12"
+    letter-spacing="-0.03em">Code<tspan fill="#B8530F">Mar</tspan></text>
+
+  <!-- Tagline principal -->
+  <text x="600" y="435"
+    text-anchor="middle"
+    font-family="'Inter', sans-serif"
+    font-weight="500"
+    font-size="32"
+    fill="#5C4A38">Sistemas y sitios web a medida</text>
+
+  <!-- Ubicación y URL -->
+  <text x="600" y="490"
+    text-anchor="middle"
+    font-family="'JetBrains Mono', monospace"
+    font-weight="500"
+    font-size="18"
+    fill="#8A7A5F"
+    letter-spacing="0.25em">MAR DEL PLATA · ARGENTINA</text>
+
+  <text x="600" y="560"
+    text-anchor="middle"
+    font-family="'JetBrains Mono', monospace"
+    font-weight="700"
+    font-size="22"
+    fill="#B8530F"
+    letter-spacing="0.05em">codemar.com.ar</text>
+</svg>
