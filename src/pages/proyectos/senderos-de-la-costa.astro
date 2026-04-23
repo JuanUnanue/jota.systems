@@ -20,6 +20,7 @@ import Footer from '../../components/Footer.astro';
         </p>
         <div class="case-actions">
           <a href="https://web-senderos-de-la-costa.vercel.app" target="_blank" rel="noopener" class="btn btn-solid">Ver sitio en vivo ↗</a>
+          <a href="#demo" class="btn">Probar demo</a>
         </div>
       </header>
 
@@ -96,6 +97,25 @@ import Footer from '../../components/Footer.astro';
           <li>Supabase (DB + Auth)</li>
           <li>Vercel</li>
         </ul>
+      </section>
+
+      <section id="demo" class="block demo-block">
+        <h2>Probá el sistema</h2>
+        <p>Instancia con datos ficticios realistas. Podés navegar los módulos, crear registros y ver reportes sin miedo a romper nada.</p>
+        <div class="demo-card">
+          <div class="demo-creds">
+            <div class="cred">
+              <span class="label">Usuario</span>
+              <code>demo@senderos.com</code>
+            </div>
+            <div class="cred">
+              <span class="label">Contraseña</span>
+              <code>demo2026</code>
+            </div>
+          </div>
+          <a href="https://web-senderos-de-la-costa.vercel.app/admin/demo" class="btn btn-solid" target="_blank" rel="noopener">Abrir demo →</a>
+          <p class="demo-note">⚠ Los datos se resetean cada 24hs. No ingreses información real.</p>
+        </div>
       </section>
 
       <section class="block cta-section">
@@ -263,6 +283,60 @@ import Footer from '../../components/Footer.astro';
     font-weight: 500;
   }
 
+  /* DEMO */
+  .demo-block {
+    margin-top: 2rem;
+    scroll-margin-top: 2rem;
+  }
+
+  .demo-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .demo-creds {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .cred {
+    padding: 1rem 1.25rem;
+    background: var(--accent-dim);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .cred .label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .cred code {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--accent);
+    font-weight: 600;
+    word-break: break-all;
+  }
+
+  .demo-note {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 1rem;
+    line-height: 1.5;
+  }
+
   /* CTA */
   .cta-section {
     text-align: center;
@@ -282,5 +356,6 @@ import Footer from '../../components/Footer.astro';
     .case-page { padding: 0 1.25rem; }
     .case-header h1 { font-size: 2rem; }
     .modules-list li { grid-template-columns: auto 1fr; }
+    .demo-creds { grid-template-columns: 1fr; }
   }
 </style>
