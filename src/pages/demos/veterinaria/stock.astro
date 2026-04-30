@@ -1,0 +1,444 @@
+---
+import DemoVeterinariaLayout from '../../../layouts/DemoVeterinariaLayout.astro';
+import { stock, stockBajo, fechaCorta, type CategoriaInsumo } from '../../../data/veterinaria';
+
+// Agrupar por categoría
+const categorias: CategoriaInsumo[] = ['Vacuna canina', 'Vacuna felina', 'Antiparasitario', 'Quirúrgico', 'Consumible'];
+const porCategoria = categorias.map((cat) => ({
+  cat,
+  items: stock.filter((i) => i.categoria === cat),
+}));
+
+const totalUnidades = stock.reduce((acc, i) => acc + i.cantidad, 0);
+
+// Última carga: ítem con la fecha más reciente
+const ultimaCargaItem = [...stock].sort((a, b) => b.ultimaCarga.localeCompare(a.ultimaCarga))[0];
+const ultimaCargaFecha = (() => {
+  const [, m, d] = ultimaCargaItem.ultimaCarga.split('-').map(Number);
+  const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  return `${d} ${meses[m - 1]}`;
+})();
+
+const getStatus = (i: typeof stock[number]) => {
+  const ratio = i.cantidad / i.minimo;
+  if (i.cantidad < i.minimo) return 'bajo';
+  if (ratio < 1.5) return 'limite';
+  return 'ok';
+};
+---
+
+<DemoVeterinariaLayout
+  title="Stock — M. Ángeles Vet"
+  pageTitle="Stock de insumos"
+  searchPlaceholder="Buscar insumo…"
+>
+  <a href="/demos/veterinaria/agenda" class="back-to-list">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Volver a la agenda
+  </a>
+
+  <div class="page-head">
+    <div>
+      <h1>Stock de insumos</h1>
+      <p class="subtitle">{stock.length} items · {totalUnidades} unidades en total</p>
+    </div>
+    <div class="page-head-actions">
+      <a href="#" class="btn-app">Exportar listado</a>
+      <a href="#" class="btn-app primary">+ Nuevo insumo</a>
+    </div>
+  </div>
+
+  <!-- Resumen visual -->
+  <section class="stock-resumen">
+    <div class="resumen-card">
+      <span class="resumen-label">Stock bajo</span>
+      <span class="resumen-val resumen-val-alert">{stockBajo.length}</span>
+      <span class="resumen-detalle">items por debajo del mínimo</span>
+    </div>
+    <div class="resumen-card">
+      <span class="resumen-label">Total items</span>
+      <span class="resumen-val">{stock.length}</span>
+      <span class="resumen-detalle">en {categorias.length} categorías</span>
+    </div>
+    <div class="resumen-card">
+      <span class="resumen-label">Última carga</span>
+      <span class="resumen-val resumen-val-fecha">{ultimaCargaFecha}</span>
+      <span class="resumen-detalle">{ultimaCargaItem.nombre.toLowerCase()}</span>
+    </div>
+  </section>
+
+  <!-- Alertas de stock bajo -->
+  {stockBajo.length > 0 && (
+    <section class="card alerta-bajo-card">
+      <div class="card-head">
+        <h2 class="card-title">⚠ Items bajo el mínimo</h2>
+        <span class="card-link">Reponer pronto</span>
+      </div>
+      <ul class="alerta-bajo-list" role="list">
+        {stockBajo.map((i) => (
+          <li class="alerta-bajo-item">
+            <div class="alerta-bajo-info">
+              <span class="alerta-bajo-nombre">{i.nombre}</span>
+              <span class="alerta-bajo-meta">
+                {i.cantidad} / {i.minimo} {i.unidad}{i.cantidad !== 1 ? 's' : ''}
+                · faltan <strong>{i.minimo - i.cantidad + 1}</strong>
+              </span>
+            </div>
+            <button type="button" class="btn-app primary alerta-bajo-cta">Reponer</button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <!-- Lista por categoría -->
+  {porCategoria.map((g) => (
+    <section class="card categoria-card">
+      <div class="card-head">
+        <h2 class="card-title">{g.cat}</h2>
+        <span class="card-link">{g.items.length} items</span>
+      </div>
+      <ul class="stock-list" role="list">
+        {g.items.map((i) => {
+          const status = getStatus(i);
+          const pct = Math.min(100, Math.round((i.cantidad / Math.max(i.minimo * 2, 1)) * 100));
+          return (
+            <li class={`stock-row stock-${status}`}>
+              <div class="stock-info">
+                <span class="stock-nombre">{i.nombre}</span>
+                <span class="stock-meta">Última carga: {fechaCorta(i.ultimaCarga)}</span>
+              </div>
+              <div class="stock-cantidad">
+                <span class="stock-cant-num">{i.cantidad}</span>
+                <span class="stock-cant-unit">{i.unidad}{i.cantidad !== 1 ? 's' : ''}</span>
+                <div class="stock-bar" aria-label={`${pct}% del nivel objetivo`}>
+                  <div class="stock-bar-fill" style={`width: ${pct}%`}></div>
+                  <span class="stock-bar-min" style={`left: ${(i.minimo / Math.max(i.minimo * 2, 1)) * 100}%`} title={`Mínimo ${i.minimo}`}></span>
+                </div>
+              </div>
+              <div class="stock-actions">
+                {status === 'bajo' && <span class="stock-pill stock-pill-bajo">Bajo</span>}
+                {status === 'limite' && <span class="stock-pill stock-pill-limite">Al límite</span>}
+                {status === 'ok' && <span class="stock-pill stock-pill-ok">OK</span>}
+                <button type="button" class="stock-btn-uso" aria-label="Registrar uso">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  Usar
+                </button>
+                <button type="button" class="stock-btn-add" aria-label="Cargar más">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                </button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  ))}
+</DemoVeterinariaLayout>
+
+<style>
+  .back-to-list {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+    transition: color var(--transition);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+
+  .back-to-list:hover { color: var(--accent); }
+
+  /* Resumen */
+  .stock-resumen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .resumen-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .resumen-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+
+  .resumen-val {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .resumen-val-alert { color: #B23A3A; }
+  .resumen-val-fecha { font-size: 1.4rem; }
+
+  .resumen-detalle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  /* Alertas stock bajo */
+  .alerta-bajo-card {
+    border-left: 4px solid #B23A3A;
+  }
+
+  .alerta-bajo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .alerta-bajo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    background: rgba(217, 80, 80, 0.05);
+    border: 1px solid rgba(217, 80, 80, 0.2);
+    border-radius: 8px;
+    flex-wrap: wrap;
+  }
+
+  .alerta-bajo-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .alerta-bajo-nombre {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+
+  .alerta-bajo-meta {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+  }
+
+  .alerta-bajo-meta strong {
+    color: #B23A3A;
+    font-weight: 700;
+  }
+
+  .alerta-bajo-cta { white-space: nowrap; }
+
+  /* Lista de stock por categoría */
+  .stock-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stock-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(140px, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .stock-row:first-child { border-top: none; }
+
+  .stock-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .stock-nombre {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.93rem;
+    line-height: 1.3;
+  }
+
+  .stock-meta {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .stock-cantidad {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.2rem 0.6rem;
+  }
+
+  .stock-cant-num {
+    grid-row: 1 / 3;
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .stock-bajo .stock-cant-num { color: #B23A3A; }
+  .stock-limite .stock-cant-num { color: #B8530F; }
+
+  .stock-cant-unit {
+    grid-column: 2;
+    grid-row: 1;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .stock-bar {
+    grid-column: 2;
+    grid-row: 2;
+    height: 6px;
+    background: var(--bg);
+    border-radius: 999px;
+    position: relative;
+    overflow: visible;
+    border: 1px solid var(--border);
+  }
+
+  .stock-bar-fill {
+    height: 100%;
+    background: #2D7A48;
+    border-radius: 999px;
+    transition: width var(--transition);
+  }
+
+  .stock-bajo .stock-bar-fill { background: #B23A3A; }
+  .stock-limite .stock-bar-fill { background: var(--accent); }
+
+  .stock-bar-min {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 2px;
+    background: var(--text-primary);
+    border-radius: 1px;
+  }
+
+  .stock-bar-min::after {
+    content: 'mín';
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .stock-actions {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .stock-pill {
+    display: inline-flex;
+    padding: 0.2rem 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .stock-pill-ok { background: rgba(40, 130, 70, 0.12); color: #2D7A48; }
+  .stock-pill-limite { background: rgba(184, 83, 15, 0.10); color: var(--accent); }
+  .stock-pill-bajo { background: rgba(217, 80, 80, 0.14); color: #B23A3A; }
+
+  .stock-btn-uso, .stock-btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--border);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all var(--transition);
+    min-height: 36px;
+  }
+
+  .stock-btn-uso:hover, .stock-btn-add:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .stock-btn-add {
+    padding: 0.5rem 0.6rem;
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .stock-row {
+      grid-template-columns: 1fr;
+      gap: 0.6rem;
+      padding: 1.1rem 0;
+    }
+    .stock-cantidad {
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+    }
+    .stock-cant-num { grid-row: 1; }
+    .stock-cant-unit { grid-row: 1; grid-column: 2; align-self: end; padding-bottom: 4px; }
+    .stock-bar { grid-column: 1 / -1; grid-row: 2; margin-top: 0.6rem; }
+    .stock-actions { justify-content: flex-start; }
+  }
+
+  @media (max-width: 480px) {
+    .alerta-bajo-item { flex-direction: column; align-items: flex-start; }
+    .alerta-bajo-cta { width: 100%; justify-content: center; }
+  }
+</style>

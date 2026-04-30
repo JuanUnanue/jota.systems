@@ -1,0 +1,492 @@
+---
+import DemoVeterinariaLayout from '../../../../layouts/DemoVeterinariaLayout.astro';
+import AvatarMascota from '../../../../components/demo-veterinaria/AvatarMascota.astro';
+import {
+  mascotas,
+  duenoPorId,
+  mascotasDelDueno,
+  nombreDueno,
+  fechaCorta,
+} from '../../../../data/veterinaria';
+
+const HOY = '2026-04-30';
+
+const totalActivos = mascotas.filter((m) => m.estado === 'activo').length;
+const totalConVacVencida = mascotas.filter((m) => m.vacunas.some((v) => v.estado === 'vencida')).length;
+const totalConVacProxima = mascotas.filter((m) => m.vacunas.some((v) => v.estado === 'proxima')).length;
+const totalAlDia = mascotas.filter((m) => m.estado === 'activo' && m.vacunas.every((v) => v.estado === 'al-dia' || v.estado === 'no-aplica')).length;
+---
+
+<DemoVeterinariaLayout
+  title="Pacientes — M. Ángeles Vet"
+  pageTitle="Pacientes"
+  searchPlaceholder="Buscar mascota, dueño, raza…"
+>
+  <div class="page-head">
+    <div>
+      <h1>Pacientes</h1>
+      <p class="subtitle">{mascotas.length} fichas · {totalActivos} activas</p>
+    </div>
+    <div class="page-head-actions">
+      <a href="#" class="btn-app">Exportar</a>
+      <a href="#" class="btn-app primary">+ Nueva mascota</a>
+    </div>
+  </div>
+
+  <div class="filters-bar">
+    <div class="filter-search">
+      <span class="filter-search-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </span>
+      <input
+        type="search"
+        id="paciente-search"
+        placeholder="Buscar por mascota, dueño, raza…"
+        autocomplete="off"
+      />
+    </div>
+    <div class="filter-pills" role="tablist" aria-label="Filtrar pacientes">
+      <button type="button" class="filter-pill active" data-filter="todos">Todos <span class="filter-count">{mascotas.length}</span></button>
+      <button type="button" class="filter-pill" data-filter="al-dia">Vac. al día <span class="filter-count">{totalAlDia}</span></button>
+      <button type="button" class="filter-pill" data-filter="vac-proxima">Vac. próxima <span class="filter-count">{totalConVacProxima}</span></button>
+      <button type="button" class="filter-pill" data-filter="vac-vencida">Vac. vencida <span class="filter-count">{totalConVacVencida}</span></button>
+      <button type="button" class="filter-pill" data-filter="inactivos">Inactivos <span class="filter-count">{mascotas.length - totalActivos}</span></button>
+    </div>
+  </div>
+
+  <div class="card pacientes-card">
+    <table class="pacientes-table">
+      <thead>
+        <tr>
+          <th class="col-paciente">Mascota</th>
+          <th>Especie · Raza</th>
+          <th>Edad</th>
+          <th>Dueño</th>
+          <th>Último control</th>
+          <th>Estado</th>
+          <th aria-label="Acciones"></th>
+        </tr>
+      </thead>
+      <tbody id="pacientes-tbody">
+        {mascotas.map((m) => {
+          const dueno = duenoPorId(m.duenoId)!;
+          const cantMascotas = mascotasDelDueno(m.duenoId).length;
+          const tieneVencida = m.vacunas.some((v) => v.estado === 'vencida');
+          const tieneProxima = m.vacunas.some((v) => v.estado === 'proxima');
+          const alDia = !tieneVencida && !tieneProxima && m.estado === 'activo';
+
+          const tags = [
+            'todos',
+            m.estado === 'inactivo' ? 'inactivos' : '',
+            tieneVencida ? 'vac-vencida' : '',
+            tieneProxima && !tieneVencida ? 'vac-proxima' : '',
+            alDia ? 'al-dia' : '',
+          ].filter(Boolean).join(' ');
+
+          return (
+            <tr
+              data-tags={tags}
+              data-search={`${m.nombre} ${m.raza} ${nombreDueno(dueno)} ${m.especie}`.toLowerCase()}
+              onclick={`window.location.href='/demos/veterinaria/pacientes/${m.slug}'`}
+            >
+              <td class="col-paciente">
+                <div class="paciente-cell">
+                  <AvatarMascota especie={m.especie} nombre={m.nombre} size="sm" />
+                  <div class="paciente-meta">
+                    <a href={`/demos/veterinaria/pacientes/${m.slug}`} class="paciente-name">{m.nombre}</a>
+                    <span class="paciente-sub">{m.sexo === 'macho' ? '♂' : '♀'} · {m.pesoKg} kg{m.castrado ? ' · cast.' : ''}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="especie-cell">
+                  <span class="especie-tag">{m.especie}</span>
+                  <span class="raza">{m.raza}</span>
+                </span>
+              </td>
+              <td><span class="edad">{m.edad} {m.edad === 1 ? 'año' : 'años'}</span></td>
+              <td>
+                <div class="dueno-cell">
+                  <span class="dueno-name">{nombreDueno(dueno)}</span>
+                  {cantMascotas > 1 && (
+                    <span class="dueno-multi" title={`Este dueño tiene ${cantMascotas} mascotas`}>
+                      ·{cantMascotas}🐾
+                    </span>
+                  )}
+                  <span class="dueno-zona">{dueno.zona}</span>
+                </div>
+              </td>
+              <td><span class="ultimo-control">{fechaCorta(m.ultimoControl)}</span></td>
+              <td>
+                {m.estado === 'inactivo' ? (
+                  <span class="pill pill-inactivo">Inactivo</span>
+                ) : tieneVencida ? (
+                  <span class="pill pill-vencida">Vencida</span>
+                ) : tieneProxima ? (
+                  <span class="pill pill-proxima">Próxima</span>
+                ) : (
+                  <span class="pill pill-aldia">Al día</span>
+                )}
+              </td>
+              <td class="col-action">
+                <a href={`/demos/veterinaria/pacientes/${m.slug}`} class="row-arrow" aria-label={`Abrir ficha de ${m.nombre}`}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                </a>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+
+    <div id="empty-state" class="empty-state" hidden>
+      <p>No encontramos pacientes con esos criterios.</p>
+    </div>
+  </div>
+</DemoVeterinariaLayout>
+
+<style>
+  .filters-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .filter-search {
+    position: relative;
+    flex: 1;
+    min-width: 220px;
+    max-width: 380px;
+  }
+
+  .filter-search input {
+    width: 100%;
+    padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-panel);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    min-height: 44px;
+  }
+
+  .filter-search input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(184, 83, 15, 0.10);
+  }
+
+  .filter-search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.85rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 38px;
+  }
+
+  .filter-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .filter-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .filter-count {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    background: rgba(0, 0, 0, 0.08);
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+  }
+
+  .filter-pill.active .filter-count {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .pacientes-card {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .pacientes-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .pacientes-table th {
+    text-align: left;
+    padding: 0.85rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    background: var(--bg);
+  }
+
+  .pacientes-table td {
+    padding: 0.95rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+    vertical-align: middle;
+    color: var(--text-primary);
+  }
+
+  .pacientes-table tbody tr {
+    cursor: pointer;
+    transition: background var(--transition);
+  }
+
+  .pacientes-table tbody tr:hover {
+    background: var(--bg);
+  }
+
+  .pacientes-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .paciente-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .paciente-meta {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+    min-width: 0;
+  }
+
+  .paciente-name {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+
+  .paciente-name:hover { color: var(--accent); }
+
+  .paciente-sub {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .especie-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    line-height: 1.2;
+  }
+
+  .especie-tag {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  .raza {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+  }
+
+  .edad, .ultimo-control {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+  }
+
+  .dueno-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    line-height: 1.3;
+  }
+
+  .dueno-name {
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .dueno-multi {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    background: rgba(184, 83, 15, 0.10);
+    padding: 0.05rem 0.35rem;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+    margin-left: 0.3rem;
+    vertical-align: middle;
+  }
+
+  .dueno-zona {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .pill-aldia { background: rgba(40, 130, 70, 0.12); color: #2D7A48; }
+  .pill-proxima { background: rgba(184, 83, 15, 0.10); color: var(--accent); }
+  .pill-vencida { background: rgba(217, 80, 80, 0.14); color: #B23A3A; }
+
+  .col-action { width: 30px; text-align: right; padding-right: 1.25rem !important; }
+
+  .row-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--text-muted);
+    border-radius: 6px;
+    transition: all var(--transition);
+  }
+
+  .row-arrow:hover {
+    background: var(--bg-alt);
+    color: var(--accent);
+  }
+
+  .empty-state {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  /* Mobile: la tabla colapsa a cards */
+  @media (max-width: 720px) {
+    .pacientes-table thead { display: none; }
+
+    .pacientes-table, .pacientes-table tbody, .pacientes-table tr, .pacientes-table td {
+      display: block;
+      width: 100%;
+    }
+
+    .pacientes-table tr {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        'paciente accion'
+        'especie  estado'
+        'dueno    dueno'
+        'control  control';
+      gap: 0.4rem 0.6rem;
+      align-items: center;
+    }
+
+    .pacientes-table tr:last-child { border-bottom: none; }
+
+    .pacientes-table td {
+      padding: 0;
+      border-bottom: none;
+    }
+
+    .pacientes-table .col-paciente { grid-area: paciente; }
+    .pacientes-table tr td:nth-child(2) { grid-area: especie; }
+    .pacientes-table tr td:nth-child(3) { display: none; } /* edad va dentro del paciente-sub */
+    .pacientes-table tr td:nth-child(4) { grid-area: dueno; }
+    .pacientes-table tr td:nth-child(5) { grid-area: control; }
+    .pacientes-table tr td:nth-child(6) { grid-area: estado; justify-self: end; }
+    .pacientes-table tr td:nth-child(7) { grid-area: accion; justify-self: end; }
+
+    .ultimo-control::before {
+      content: 'Último control: ';
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-right: 0.3rem;
+    }
+  }
+</style>
+
+<script>
+  const search = document.getElementById('paciente-search') as HTMLInputElement | null;
+  const tbody = document.getElementById('pacientes-tbody');
+  const empty = document.getElementById('empty-state');
+  const pills = document.querySelectorAll<HTMLButtonElement>('.filter-pill');
+
+  let activeFilter = 'todos';
+  let activeQuery = '';
+
+  const apply = () => {
+    if (!tbody) return;
+    let visible = 0;
+    const rows = tbody.querySelectorAll<HTMLTableRowElement>('tr');
+    rows.forEach((row) => {
+      const tags = (row.dataset.tags || '').split(' ');
+      const haystack = row.dataset.search || '';
+      const matchFilter = activeFilter === 'todos' || tags.includes(activeFilter);
+      const matchQuery = !activeQuery || haystack.includes(activeQuery);
+      if (matchFilter && matchQuery) {
+        row.style.display = '';
+        visible++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+    if (empty) empty.hidden = visible > 0;
+  };
+
+  search?.addEventListener('input', () => {
+    activeQuery = (search.value || '').toLowerCase().trim();
+    apply();
+  });
+
+  pills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      pills.forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeFilter = pill.dataset.filter || 'todos';
+      apply();
+    });
+  });
+</script>

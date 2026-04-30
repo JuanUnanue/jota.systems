@@ -1,0 +1,91 @@
+---
+import AvatarMascota from './AvatarMascota.astro';
+import type { Mascota } from '../../data/veterinaria';
+
+export interface Props {
+  mascotas: Mascota[];
+}
+
+const { mascotas } = Astro.props;
+---
+
+{mascotas.length > 0 && (
+  <div class="otras-mascotas">
+    <p class="otras-titulo">Otras mascotas de este dueño</p>
+    <ul class="otras-list" role="list">
+      {mascotas.map((m) => (
+        <li>
+          <a href={`/demos/veterinaria/pacientes/${m.slug}`} class="otra-chip">
+            <AvatarMascota especie={m.especie} nombre={m.nombre} size="sm" />
+            <span class="otra-info">
+              <span class="otra-nombre">{m.nombre}</span>
+              <span class="otra-meta">{m.raza} · {m.edad}a</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+<style>
+  .otras-mascotas {
+    border-top: 1px dashed var(--border);
+    padding-top: 0.85rem;
+    margin-top: 0.85rem;
+  }
+
+  .otras-titulo {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0 0 0.6rem;
+  }
+
+  .otras-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .otra-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem 0.4rem 0.4rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all var(--transition);
+  }
+
+  .otra-chip:hover {
+    border-color: var(--accent);
+    background: var(--bg-panel);
+  }
+
+  .otra-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+
+  .otra-nombre {
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .otra-meta {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+</style>

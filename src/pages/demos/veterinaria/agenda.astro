@@ -1,0 +1,746 @@
+---
+import DemoVeterinariaLayout from '../../../layouts/DemoVeterinariaLayout.astro';
+import AvatarMascota from '../../../components/demo-veterinaria/AvatarMascota.astro';
+import {
+  visitasHoy,
+  visitasSemana,
+  duenoPorId,
+  mascotaPorSlug,
+  nombreDueno,
+  type Visita,
+  type TipoVisita,
+} from '../../../data/veterinaria';
+
+const HOY = '2026-04-30';
+
+// Combinar todas las visitas
+const todas: Visita[] = [...visitasSemana, ...visitasHoy].sort((x, y) => {
+  if (x.fecha !== y.fecha) return x.fecha.localeCompare(y.fecha);
+  return x.hora.localeCompare(y.hora);
+});
+
+const dias = [
+  { iso: '2026-04-27', label: 'Lun', n: '27', mes: 'abr' },
+  { iso: '2026-04-28', label: 'Mar', n: '28', mes: 'abr' },
+  { iso: '2026-04-29', label: 'Mié', n: '29', mes: 'abr' },
+  { iso: '2026-04-30', label: 'Jue', n: '30', mes: 'abr' },
+  { iso: '2026-05-01', label: 'Vie', n: '01', mes: 'may' },
+  { iso: '2026-05-02', label: 'Sáb', n: '02', mes: 'may' },
+];
+
+const visitasPorDia = dias.map((d) => ({
+  ...d,
+  visitas: todas.filter((v) => v.fecha === d.iso),
+}));
+
+const total = todas.length;
+const proximas = todas.filter((v) => v.fecha > HOY || (v.fecha === HOY && v.estado === 'confirmado')).length;
+
+const colorTipo: Record<TipoVisita, string> = {
+  'Control': 'control',
+  'Vacunación': 'vacuna',
+  'Antiparasitario': 'antipara',
+  'Urgencia': 'urgencia',
+  'Cirugía': 'cirugia',
+  'Castración': 'cirugia',
+  'Limpieza dental': 'control',
+  'Control + vacuna': 'control',
+};
+---
+
+<DemoVeterinariaLayout
+  title="Agenda — M. Ángeles Vet"
+  pageTitle="Agenda"
+  searchPlaceholder="Buscar visita, dueño…"
+>
+  <div class="page-head">
+    <div>
+      <h1>Agenda semanal</h1>
+      <p class="subtitle">27 abr – 02 may 2026 · {total} visitas · {proximas} próximas</p>
+    </div>
+    <div class="page-head-actions">
+      <a href="/demos/veterinaria/stock" class="btn-app stock-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16zM3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/>
+        </svg>
+        Stock
+      </a>
+      <a href="#" class="btn-app primary">+ Nueva visita</a>
+    </div>
+  </div>
+
+  <!-- Toolbar: nav + view toggle -->
+  <div class="agenda-toolbar">
+    <div class="agenda-nav">
+      <button type="button" class="demo-icon-btn" aria-label="Semana anterior">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="agenda-week-label">Semana del 27 al 02</span>
+      <button type="button" class="demo-icon-btn" aria-label="Próxima semana">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <div class="view-toggle" role="tablist" aria-label="Vista">
+      <button type="button" class="view-btn" data-view="dia" id="view-dia">Día</button>
+      <button type="button" class="view-btn active" data-view="semana" id="view-semana">Semana</button>
+    </div>
+  </div>
+
+  <!-- Selector de día (visible en vista Día y mobile) -->
+  <div class="day-tabs" role="tablist" aria-label="Día">
+    {dias.map((d) => (
+      <button
+        type="button"
+        class={`day-tab ${d.iso === HOY ? 'today' : ''} ${d.iso === HOY ? 'active' : ''}`}
+        data-day={d.iso}
+      >
+        <span class="day-tab-label">{d.label}</span>
+        <span class="day-tab-num">{d.n}</span>
+      </button>
+    ))}
+  </div>
+
+  <!-- Vista Semana (default desktop) -->
+  <section class="vista vista-semana" data-view="semana">
+    <div class="semana-grid">
+      {visitasPorDia.map((d) => (
+        <div class={`dia-col ${d.iso === HOY ? 'dia-hoy' : ''}`}>
+          <div class="dia-col-head">
+            <span class="dia-col-label">{d.label} {d.n}</span>
+            <span class="dia-col-count">{d.visitas.length}</span>
+          </div>
+          <ul class="dia-col-list" role="list">
+            {d.visitas.length === 0 ? (
+              <li class="dia-vacio">Sin visitas</li>
+            ) : (
+              d.visitas.map((v) => {
+                const dueno = duenoPorId(v.duenoId)!;
+                const mascotas = v.mascotaSlugs.map((s) => mascotaPorSlug(s)!);
+                return (
+                  <li class={`visita-card visita-${v.estado} tipo-${colorTipo[v.tipo]}`}>
+                    <div class="visita-card-head">
+                      <span class="visita-card-hora">{v.hora}</span>
+                      <span class={`visita-card-tipo tipo-${colorTipo[v.tipo]}`}>{v.tipo}</span>
+                    </div>
+                    <p class="visita-card-dueno">
+                      {nombreDueno(dueno)}
+                      {mascotas.length > 1 && <span class="multi-tag">·{mascotas.length}🐾</span>}
+                    </p>
+                    <p class="visita-card-mascotas">
+                      {mascotas.map((m) => m.nombre).join(' + ')}
+                    </p>
+                    <p class="visita-card-direccion">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      {dueno.direccion}
+                    </p>
+                  </li>
+                );
+              })
+            )}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Vista Día (mobile-first) -->
+  <section class="vista vista-dia" data-view="dia" hidden>
+    {visitasPorDia.map((d) => (
+      <div class="dia-detalle" data-day-content={d.iso} hidden={d.iso !== HOY}>
+        <h2 class="dia-detalle-titulo">
+          {d.label} {d.n} de {d.mes}
+          <span class="dia-detalle-count">{d.visitas.length} {d.visitas.length === 1 ? 'visita' : 'visitas'}</span>
+        </h2>
+
+        {d.visitas.length === 0 ? (
+          <p class="dia-vacio-mensaje">No hay visitas agendadas para este día.</p>
+        ) : (
+          <ul class="dia-list" role="list">
+            {d.visitas.map((v) => {
+              const dueno = duenoPorId(v.duenoId)!;
+              const mascotas = v.mascotaSlugs.map((s) => mascotaPorSlug(s)!);
+              return (
+                <li class={`dia-row dia-row-${v.estado}`}>
+                  <div class="dia-row-time">
+                    <span class="dia-row-hora">{v.hora}</span>
+                    <span class="dia-row-dur">{v.duracionMin}min</span>
+                  </div>
+                  <div class="dia-row-body">
+                    <div class="dia-row-head">
+                      <span class={`tipo-pill tipo-${colorTipo[v.tipo]}`}>{v.tipo}</span>
+                      <span class={`pill pill-${v.estado === 'finalizado' ? 'finalizado' : v.estado === 'en-curso' ? 'en-sala' : 'confirmado'}`}>
+                        {v.estado === 'en-curso' ? 'En curso' : v.estado === 'finalizado' ? 'Hecho' : 'Confirmada'}
+                      </span>
+                    </div>
+                    <p class="dia-row-dueno">
+                      {nombreDueno(dueno)}
+                      {mascotas.length > 1 && <span class="multi-tag">·{mascotas.length}🐾</span>}
+                    </p>
+                    <div class="dia-row-mascotas">
+                      {mascotas.map((m) => (
+                        <a href={`/demos/veterinaria/pacientes/${m.slug}`} class="mascota-chip">
+                          <AvatarMascota especie={m.especie} nombre={m.nombre} size="sm" />
+                          <span>{m.nombre}</span>
+                        </a>
+                      ))}
+                    </div>
+                    <p class="dia-row-direccion">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      {dueno.direccion} · {dueno.zona}
+                    </p>
+                    <p class="dia-row-procedimiento">{v.procedimiento}</p>
+                    {v.notas && <p class="dia-row-nota">⚠ {v.notas}</p>}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    ))}
+  </section>
+</DemoVeterinariaLayout>
+
+<style>
+  .stock-btn { letter-spacing: 0.02em; }
+  .stock-btn svg { color: var(--accent); }
+
+  /* Toolbar */
+  .agenda-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .agenda-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .agenda-week-label {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    font-weight: 600;
+  }
+
+  .view-toggle {
+    display: inline-flex;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.2rem;
+    gap: 0.15rem;
+  }
+
+  .view-btn {
+    background: transparent;
+    border: none;
+    padding: 0.45rem 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+    transition: all var(--transition);
+    min-height: 36px;
+  }
+
+  .view-btn:hover { color: var(--text-primary); }
+  .view-btn.active { background: var(--accent); color: var(--bg); }
+  .view-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Day tabs (selector horizontal de días) */
+  .day-tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+  }
+
+  .day-tabs::-webkit-scrollbar { display: none; }
+
+  .day-tab {
+    display: none; /* solo visible en vista Día y mobile */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 0.85rem;
+    min-width: 64px;
+    min-height: 60px;
+    cursor: pointer;
+    transition: all var(--transition);
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .day-tab:hover { border-color: var(--accent); }
+
+  .day-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .day-tab.active .day-tab-label,
+  .day-tab.active .day-tab-num {
+    color: var(--bg);
+  }
+
+  .day-tab.today::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  .day-tab.active.today::after { background: var(--bg); }
+
+  .day-tab-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .day-tab-num {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 0.1rem;
+  }
+
+  /* === Vista SEMANA (desktop default) === */
+  .semana-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.6rem;
+    overflow-x: auto;
+  }
+
+  .dia-col {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dia-col.dia-hoy {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .dia-col-head {
+    background: var(--bg);
+    padding: 0.7rem 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dia-col.dia-hoy .dia-col-head {
+    background: var(--accent);
+    color: var(--bg);
+    border-bottom-color: var(--accent-hover);
+  }
+
+  .dia-col-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .dia-col.dia-hoy .dia-col-label { color: var(--bg); }
+
+  .dia-col-count {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    background: var(--bg-panel);
+    padding: 0.1rem 0.4rem;
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .dia-col.dia-hoy .dia-col-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--bg);
+  }
+
+  .dia-col-list {
+    list-style: none;
+    padding: 0.5rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+  }
+
+  .dia-vacio {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 1rem 0.5rem;
+    letter-spacing: 0.03em;
+  }
+
+  /* Card de visita en vista semana */
+  .visita-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left-width: 3px;
+    border-radius: 6px;
+    padding: 0.55rem 0.7rem;
+    transition: all var(--transition);
+  }
+
+  .visita-card.tipo-control { border-left-color: var(--accent); }
+  .visita-card.tipo-vacuna { border-left-color: #2D7A48; }
+  .visita-card.tipo-antipara { border-left-color: #6B7AAB; }
+  .visita-card.tipo-urgencia { border-left-color: #B23A3A; }
+  .visita-card.tipo-cirugia { border-left-color: #2A1D12; }
+
+  .visita-card.visita-finalizado { opacity: 0.5; }
+  .visita-card.visita-en-curso {
+    background: rgba(184, 83, 15, 0.08);
+    border-color: var(--accent);
+  }
+
+  .visita-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .visita-card-hora {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .visita-card-tipo {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+  }
+
+  .visita-card-tipo.tipo-control { background: rgba(184, 83, 15, 0.12); color: var(--accent); }
+  .visita-card-tipo.tipo-vacuna { background: rgba(40, 130, 70, 0.14); color: #2D7A48; }
+  .visita-card-tipo.tipo-antipara { background: rgba(107, 122, 171, 0.16); color: #4A5990; }
+  .visita-card-tipo.tipo-urgencia { background: rgba(217, 80, 80, 0.14); color: #B23A3A; }
+  .visita-card-tipo.tipo-cirugia { background: rgba(42, 29, 18, 0.14); color: var(--text-primary); }
+
+  .visita-card-dueno {
+    margin: 0.15rem 0 0.1rem;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--text-primary);
+    line-height: 1.25;
+  }
+
+  .multi-tag {
+    margin-left: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    font-weight: 600;
+  }
+
+  .visita-card-mascotas {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.25;
+  }
+
+  .visita-card-direccion {
+    margin: 0.3rem 0 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .visita-card-direccion svg { color: var(--accent); flex-shrink: 0; }
+
+  /* === Vista DÍA (mobile-first) === */
+  .dia-detalle-titulo {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.85rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .dia-detalle-count {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.03em;
+    font-weight: 500;
+  }
+
+  .dia-vacio-mensaje {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 2rem 1rem;
+    background: var(--bg-panel);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    letter-spacing: 0.02em;
+  }
+
+  .dia-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .dia-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    transition: all var(--transition);
+  }
+
+  .dia-row-finalizado { opacity: 0.6; }
+  .dia-row-en-curso {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .dia-row-time {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    border-right: 1px solid var(--border);
+    padding-right: 1rem;
+  }
+
+  .dia-row-hora {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .dia-row-dur {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .dia-row-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .dia-row-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tipo-pill {
+    display: inline-flex;
+    padding: 0.2rem 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .tipo-pill.tipo-control { background: rgba(184, 83, 15, 0.12); color: var(--accent); }
+  .tipo-pill.tipo-vacuna { background: rgba(40, 130, 70, 0.14); color: #2D7A48; }
+  .tipo-pill.tipo-antipara { background: rgba(107, 122, 171, 0.16); color: #4A5990; }
+  .tipo-pill.tipo-urgencia { background: rgba(217, 80, 80, 0.14); color: #B23A3A; }
+  .tipo-pill.tipo-cirugia { background: rgba(42, 29, 18, 0.14); color: var(--text-primary); }
+
+  .dia-row-dueno {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+
+  .dia-row-mascotas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .mascota-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.6rem 0.3rem 0.3rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all var(--transition);
+  }
+
+  .mascota-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .dia-row-direccion {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+  }
+
+  .dia-row-direccion svg { color: var(--accent); flex-shrink: 0; }
+
+  .dia-row-procedimiento {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .dia-row-nota {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  /* Visibilidad de día/semana se maneja vía data-active-view en el body */
+  body[data-active-view="semana"] .vista-dia { display: none; }
+  body[data-active-view="semana"] .day-tab { display: none; }
+  body[data-active-view="dia"] .vista-semana { display: none; }
+  body[data-active-view="dia"] .day-tab { display: flex; }
+
+  /* Mobile: ocultamos el toggle de Semana */
+  @media (max-width: 1024px) {
+    .view-btn[data-view="semana"] { display: none; }
+  }
+
+  @media (max-width: 720px) {
+    .agenda-toolbar { gap: 0.6rem; }
+    .agenda-week-label { font-size: 0.78rem; }
+    .dia-row { grid-template-columns: 70px 1fr; padding: 0.85rem; }
+    .dia-row-time { padding-right: 0.75rem; }
+    .dia-row-hora { font-size: 1rem; }
+  }
+
+  @media (max-width: 480px) {
+    .stock-btn span:not(:empty) { display: none; }
+    .day-tabs { gap: 0.3rem; }
+    .day-tab { min-width: 56px; padding: 0.5rem 0.6rem; }
+  }
+</style>
+
+<script>
+  const viewBtns = document.querySelectorAll<HTMLButtonElement>('.view-btn');
+  const dayTabs = document.querySelectorAll<HTMLButtonElement>('.day-tab');
+  const dayContents = document.querySelectorAll<HTMLElement>('[data-day-content]');
+
+  const setView = (view: 'dia' | 'semana') => {
+    document.body.dataset.activeView = view;
+    viewBtns.forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+    // Limpiar el hidden inicial de SSR — a partir de ahora el control es CSS
+    document.querySelectorAll<HTMLElement>('.vista').forEach((v) => v.hidden = false);
+  };
+
+  const setDay = (iso: string) => {
+    dayTabs.forEach((t) => t.classList.toggle('active', t.dataset.day === iso));
+    dayContents.forEach((c) => {
+      c.hidden = c.dataset.dayContent !== iso;
+    });
+  };
+
+  viewBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const view = btn.dataset.view as 'dia' | 'semana';
+      setView(view);
+    });
+  });
+
+  dayTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const iso = tab.dataset.day;
+      if (iso) setDay(iso);
+    });
+  });
+
+  // Default: Día en mobile, Semana en desktop
+  setView(window.innerWidth <= 1024 ? 'dia' : 'semana');
+</script>

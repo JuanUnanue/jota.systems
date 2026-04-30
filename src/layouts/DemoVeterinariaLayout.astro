@@ -1,0 +1,41 @@
+---
+import DemoAppLayout from './DemoAppLayout.astro';
+import { menuItems } from '../data/veterinaria';
+
+export interface Props {
+  title: string;
+  pageTitle: string;
+  searchPlaceholder?: string;
+  bodyClass?: string;
+}
+
+const { title, pageTitle, searchPlaceholder, bodyClass } = Astro.props;
+
+const brand = {
+  href: '/demos/veterinaria/dashboard',
+  mark: 'MA',
+  name: 'M. Ángeles',
+  sub: 'Vet a domicilio',
+  ariaLabel: 'M. Ángeles Martínez — veterinaria a domicilio — ir al dashboard',
+};
+
+const user = {
+  initials: 'MA',
+  name: 'M. Ángeles Martínez',
+  role: 'Veterinaria',
+};
+---
+
+<DemoAppLayout
+  title={title}
+  pageTitle={pageTitle}
+  searchPlaceholder={searchPlaceholder ?? 'Buscar mascota, dueño, raza…'}
+  bodyClass={bodyClass}
+  brand={brand}
+  user={user}
+  logoutHref="/demos/veterinaria/"
+  menuItems={menuItems}
+  primaryCount={3}
+>
+  <slot />
+</DemoAppLayout>

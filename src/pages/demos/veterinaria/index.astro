@@ -1,0 +1,265 @@
+---
+import '../../../styles/global.css';
+import '../../../styles/demo-app.css';
+import DemoBanner from '../../../components/demo-shell/DemoBanner.astro';
+import DemoLogo from '../../../components/demo-shell/DemoLogo.astro';
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>M. Ángeles Martínez — Veterinaria a domicilio</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#B8530F" />
+  </head>
+  <body class="login-body">
+    <DemoBanner />
+
+    <main class="login-page">
+      <div class="login-card">
+        <div class="login-brand">
+          <DemoLogo
+            href="/demos/veterinaria/"
+            mark="MA"
+            name="M. Ángeles Martínez"
+            sub="Veterinaria a domicilio"
+            size="lg"
+          />
+        </div>
+
+        <h2 class="login-title">Ingresar al sistema</h2>
+        <p class="login-sub">Sistema interno · gestión de pacientes y agenda</p>
+
+        <form class="login-form" action="/demos/veterinaria/dashboard" method="GET">
+          <label class="login-field">
+            <span>Email</span>
+            <input
+              type="email"
+              name="email"
+              placeholder="mangeles@vetadomicilio.com.ar"
+              autocomplete="username"
+              value="mangeles@vetadomicilio.com.ar"
+            />
+          </label>
+
+          <label class="login-field">
+            <span>Contraseña</span>
+            <input
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              value="demo2026"
+            />
+          </label>
+
+          <div class="login-row">
+            <label class="login-check">
+              <input type="checkbox" checked />
+              <span>Mantener sesión iniciada</span>
+            </label>
+            <a href="#" class="login-forgot">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <button type="submit" class="btn-app primary login-btn">
+            Ingresar
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </form>
+
+        <p class="login-hint">
+          <span class="login-hint-tag">DEMO</span>
+          cualquier credencial entra — el botón te lleva al dashboard
+        </p>
+      </div>
+
+      <footer class="login-foot">
+        <p>Sistema diseñado y desarrollado por <a href="/" target="_blank" rel="noopener">CodeMar ↗</a></p>
+      </footer>
+    </main>
+
+    <style>
+      .login-body {
+        background:
+          radial-gradient(ellipse at top, rgba(184, 83, 15, 0.06), transparent 50%),
+          var(--bg);
+        min-height: 100vh;
+      }
+
+      .login-page {
+        min-height: calc(100vh - 36px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        gap: 1.5rem;
+      }
+
+      .login-card {
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 2.25rem;
+        max-width: 420px;
+        width: 100%;
+        box-shadow:
+          0 1px 2px rgba(42, 29, 18, 0.04),
+          0 8px 28px rgba(42, 29, 18, 0.06);
+      }
+
+      .login-brand {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.75rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .login-brand :global(.demo-logo-link) {
+        padding: 0;
+      }
+
+      .login-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.02em;
+      }
+
+      .login-sub {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin: 0 0 1.5rem;
+        letter-spacing: 0.02em;
+      }
+
+      .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .login-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .login-field span {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-secondary);
+      }
+
+      .login-field input {
+        padding: 0.85rem 0.85rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--bg);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        transition: all var(--transition);
+        min-height: 44px;
+      }
+
+      .login-field input:focus {
+        outline: none;
+        border-color: var(--accent);
+        background: var(--bg-panel);
+        box-shadow: 0 0 0 3px rgba(184, 83, 15, 0.12);
+      }
+
+      .login-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.25rem;
+      }
+
+      .login-check {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+      }
+
+      .login-check input {
+        accent-color: var(--accent);
+      }
+
+      .login-forgot {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--accent);
+      }
+
+      .login-btn {
+        margin-top: 0.5rem;
+        justify-content: center;
+        padding: 0.95rem 1rem;
+        font-size: 0.95rem;
+        min-height: 48px;
+      }
+
+      .login-hint {
+        margin: 1.5rem 0 0;
+        padding-top: 1.25rem;
+        border-top: 1px dashed var(--border);
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      .login-hint-tag {
+        background: var(--accent);
+        color: var(--bg);
+        padding: 0.1rem 0.45rem;
+        border-radius: 3px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        margin-right: 0.4rem;
+      }
+
+      .login-foot {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-align: center;
+      }
+
+      .login-foot a {
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-strong);
+        padding-bottom: 1px;
+      }
+
+      .login-foot a:hover {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
+
+      @media (max-width: 480px) {
+        .login-card { padding: 1.75rem 1.25rem; }
+        .login-title { font-size: 1.25rem; }
+      }
+    </style>
+  </body>
+</html>

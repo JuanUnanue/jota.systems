@@ -1,0 +1,56 @@
+---
+import type { Especie } from '../../data/veterinaria';
+import { iconoEspecie } from '../../data/veterinaria';
+
+export interface Props {
+  especie: Especie;
+  nombre: string;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const { especie, nombre, size = 'md' } = Astro.props;
+
+const sizes = {
+  sm: { box: 32, icon: 18, fontSize: 0.75 },
+  md: { box: 44, icon: 24, fontSize: 0.95 },
+  lg: { box: 80, icon: 44, fontSize: 1.5 },
+};
+const s = sizes[size];
+---
+
+<span
+  class={`avatar-mascota avatar-${especie} avatar-${size}`}
+  style={`width:${s.box}px;height:${s.box}px;`}
+  aria-label={`${nombre} (${especie})`}
+>
+  <svg
+    viewBox="0 0 24 24"
+    width={s.icon}
+    height={s.icon}
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path d={iconoEspecie[especie]} />
+  </svg>
+</span>
+
+<style>
+  .avatar-mascota {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+
+  .avatar-perro {
+    background: rgba(184, 83, 15, 0.10);
+    color: var(--accent);
+  }
+
+  .avatar-gato {
+    background: rgba(42, 29, 18, 0.08);
+    color: var(--text-primary);
+  }
+</style>

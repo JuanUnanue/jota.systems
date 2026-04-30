@@ -1,0 +1,454 @@
+---
+import DemoVeterinariaLayout from '../../../../layouts/DemoVeterinariaLayout.astro';
+import AvatarMascota from '../../../../components/demo-veterinaria/AvatarMascota.astro';
+import CalendarioSanitario from '../../../../components/demo-veterinaria/CalendarioSanitario.astro';
+import OtrasMascotas from '../../../../components/demo-veterinaria/OtrasMascotas.astro';
+import {
+  mascotas,
+  mascotaPorSlug,
+  duenoPorId,
+  otrasMascotas,
+  nombreDueno,
+  fechaCorta,
+} from '../../../../data/veterinaria';
+
+export async function getStaticPaths() {
+  return mascotas.map((m) => ({ params: { slug: m.slug } }));
+}
+
+const { slug } = Astro.params;
+const mascota = mascotaPorSlug(slug as string);
+
+if (!mascota) {
+  return Astro.redirect('/demos/veterinaria/pacientes');
+}
+
+const dueno = duenoPorId(mascota.duenoId)!;
+const otras = otrasMascotas(mascota.slug);
+
+// Próxima vacuna o antipara más urgente para mostrar en el header
+const proximas = [
+  ...mascota.vacunas
+    .filter((v) => v.estado !== 'no-aplica')
+    .map((v) => ({ tipo: 'vacuna', nombre: v.nombre, fecha: v.proximaAplicacion, estado: v.estado })),
+  ...mascota.antiparasitarios
+    .map((a) => ({ tipo: 'antipara', nombre: a.nombre, fecha: a.proximaAplicacion, estado: a.estado })),
+].sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+const masUrgente = proximas[0];
+---
+
+<DemoVeterinariaLayout
+  title={`${mascota.nombre} — Ficha clínica`}
+  pageTitle={`${mascota.nombre}`}
+  searchPlaceholder="Buscar mascota, dueño…"
+>
+  <a href="/demos/veterinaria/pacientes" class="back-to-list">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Volver a pacientes
+  </a>
+
+  <!-- HEADER de mascota -->
+  <div class="mascota-header card">
+    <div class="mascota-header-main">
+      <AvatarMascota especie={mascota.especie} nombre={mascota.nombre} size="lg" />
+      <div class="mascota-info">
+        <div class="mascota-name-row">
+          <h1 class="mascota-name">{mascota.nombre}</h1>
+          <span class="pill pill-activo">{mascota.estado === 'activo' ? 'Activo' : 'Inactivo'}</span>
+        </div>
+        <p class="mascota-meta">
+          {mascota.raza} · {mascota.edad} {mascota.edad === 1 ? 'año' : 'años'} ·
+          {mascota.sexo === 'macho' ? ' macho' : ' hembra'} ·
+          {mascota.pesoKg} kg{mascota.castrado ? ' · castrado/a' : ''}
+        </p>
+        {masUrgente && masUrgente.estado !== 'al-dia' && (
+          <p class={`mascota-alerta mascota-alerta-${masUrgente.estado}`}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Próxima {masUrgente.tipo === 'vacuna' ? 'vacuna' : 'aplicación'}:
+            <strong>{masUrgente.nombre}</strong> · {fechaCorta(masUrgente.fecha)}
+          </p>
+        )}
+      </div>
+    </div>
+    <div class="mascota-actions">
+      <a href="#" class="btn-app primary">+ Cargar visita</a>
+      <a href="#" class="btn-app">Editar</a>
+    </div>
+  </div>
+
+  <!-- Datos clínicos + Dueño -->
+  <section class="bloque-superior">
+    <div class="card data-card">
+      <h2 class="card-title">Datos clínicos</h2>
+      <dl class="data-list">
+        <div><dt>Especie</dt><dd class="capitalize">{mascota.especie}</dd></div>
+        <div><dt>Raza</dt><dd>{mascota.raza}</dd></div>
+        <div><dt>Sexo</dt><dd class="capitalize">{mascota.sexo}</dd></div>
+        <div><dt>Edad</dt><dd>{mascota.edad} {mascota.edad === 1 ? 'año' : 'años'}</dd></div>
+        <div><dt>Peso actual</dt><dd>{mascota.pesoKg} kg</dd></div>
+        <div><dt>Castrado/a</dt><dd>{mascota.castrado ? 'Sí' : 'No'}</dd></div>
+        {mascota.microchip && <div><dt>Microchip</dt><dd class="mono">{mascota.microchip}</dd></div>}
+        <div><dt>Alta</dt><dd>{fechaCorta(mascota.fechaAlta)}</dd></div>
+        <div class="data-full"><dt>Alergias</dt><dd>{mascota.alergias.length > 0 ? mascota.alergias.join(', ') : 'Sin alergias conocidas'}</dd></div>
+        {mascota.observaciones && (
+          <div class="data-full">
+            <dt>Observaciones</dt>
+            <dd class="data-obs">{mascota.observaciones}</dd>
+          </div>
+        )}
+      </dl>
+    </div>
+
+    <div class="card dueno-card">
+      <h2 class="card-title">Dueño</h2>
+      <div class="dueno-detail">
+        <p class="dueno-detail-name">{nombreDueno(dueno)}</p>
+        <ul class="dueno-detail-list">
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <a href={`tel:${dueno.telefono.replace(/\s/g, '')}`}>{dueno.telefono}</a>
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <a href={`mailto:${dueno.email}`}>{dueno.email}</a>
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>{dueno.direccion} · <strong>{dueno.zona}</strong></span>
+          </li>
+        </ul>
+
+        <OtrasMascotas mascotas={otras} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Calendarios sanitarios -->
+  <section class="card">
+    <CalendarioSanitario
+      titulo="Calendario de vacunación"
+      items={mascota.vacunas}
+      ctaLabel="Registrar vacunación"
+    />
+  </section>
+
+  {mascota.antiparasitarios.length > 0 && (
+    <section class="card">
+      <CalendarioSanitario
+        titulo="Calendario de antiparasitarios"
+        items={mascota.antiparasitarios}
+        ctaLabel="Registrar aplicación"
+        agruparPorVia={true}
+      />
+    </section>
+  )}
+
+  <!-- Historia clínica -->
+  <section class="card historia-card">
+    <div class="card-head">
+      <h2 class="card-title">Historia clínica</h2>
+      <span class="card-link">{mascota.historia.length} {mascota.historia.length === 1 ? 'registro' : 'registros'}</span>
+    </div>
+    <ol class="historia-list" role="list">
+      {mascota.historia.map((h) => (
+        <li>
+          <span class="historia-dot" aria-hidden="true"></span>
+          <div class="historia-content">
+            <div class="historia-head">
+              <span class="historia-fecha">{fechaCorta(h.fecha)}</span>
+              <span class="historia-titulo">{h.titulo}</span>
+              {h.pesoKg && <span class="historia-peso">{h.pesoKg} kg</span>}
+            </div>
+            <p class="historia-detalle">{h.detalle}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+</DemoVeterinariaLayout>
+
+<style>
+  .back-to-list {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+    transition: color var(--transition);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+
+  .back-to-list:hover { color: var(--accent); }
+
+  .mascota-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .mascota-header-main {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+
+  .mascota-info {
+    min-width: 0;
+  }
+
+  .mascota-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .mascota-name {
+    font-size: clamp(1.4rem, 3vw, 1.75rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .mascota-meta {
+    margin: 0.25rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .mascota-alerta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0.6rem 0 0;
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+  }
+
+  .mascota-alerta-proxima { background: rgba(184, 83, 15, 0.10); color: var(--accent); }
+  .mascota-alerta-vencida { background: rgba(217, 80, 80, 0.12); color: #B23A3A; }
+
+  .mascota-alerta strong {
+    color: inherit;
+    font-weight: 700;
+    text-transform: capitalize;
+  }
+
+  .mascota-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    align-self: start;
+  }
+
+  /* Pill activo dentro del header */
+  .pill-activo { background: rgba(40, 130, 70, 0.12); color: #2D7A48; }
+  .pill-inactivo { background: rgba(42, 29, 18, 0.08); color: var(--text-muted); }
+
+  /* Bloque superior — datos + dueño */
+  .bloque-superior {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .card { margin-bottom: 1.25rem; }
+  .bloque-superior .card { margin-bottom: 0; }
+
+  .data-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem 1.25rem;
+    margin: 0.75rem 0 0;
+  }
+
+  .data-list > div { min-width: 0; }
+  .data-list .data-full { grid-column: 1 / -1; }
+
+  .data-list dt {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+
+  .data-list dd {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+
+  .data-list dd.mono {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .data-list dd.capitalize { text-transform: capitalize; }
+
+  .data-obs {
+    background: var(--bg);
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
+    font-size: 0.85rem !important;
+  }
+
+  /* Dueño */
+  .dueno-detail-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0.75rem 0 0.6rem;
+  }
+
+  .dueno-detail-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .dueno-detail-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    min-height: 22px;
+  }
+
+  .dueno-detail-list svg { color: var(--accent); flex-shrink: 0; margin-top: 3px; }
+
+  .dueno-detail-list a { color: var(--text-primary); text-decoration: none; }
+  .dueno-detail-list a:hover { color: var(--accent); }
+
+  /* Historia clínica timeline */
+  .historia-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: hist;
+    position: relative;
+  }
+
+  .historia-list::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .historia-list li {
+    position: relative;
+    padding: 0.5rem 0 0.85rem 2rem;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .historia-list li:last-child { border-bottom: none; }
+
+  .historia-dot {
+    position: absolute;
+    left: 4px;
+    top: 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg-panel);
+    box-shadow: 0 0 0 2px var(--border);
+  }
+
+  .historia-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .historia-fecha {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+    font-weight: 600;
+  }
+
+  .historia-titulo {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.92rem;
+  }
+
+  .historia-peso {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    background: var(--bg-alt);
+    color: var(--text-secondary);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+    margin-left: auto;
+  }
+
+  .historia-detalle {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .mascota-header {
+      grid-template-columns: 1fr;
+    }
+    .mascota-actions { justify-content: stretch; }
+    .mascota-actions .btn-app { flex: 1; justify-content: center; }
+  }
+
+  @media (max-width: 720px) {
+    .bloque-superior {
+      grid-template-columns: 1fr;
+    }
+    .data-list { grid-template-columns: 1fr; }
+    .mascota-header-main { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  }
+
+  @media (max-width: 480px) {
+    .mascota-name { font-size: 1.4rem; }
+  }
+</style>

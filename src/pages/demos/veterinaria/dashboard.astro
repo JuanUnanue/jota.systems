@@ -1,0 +1,526 @@
+---
+import DemoVeterinariaLayout from '../../../layouts/DemoVeterinariaLayout.astro';
+import AvatarMascota from '../../../components/demo-veterinaria/AvatarMascota.astro';
+import {
+  kpis,
+  visitasHoy,
+  visitasSemana,
+  alertas,
+  duenoPorId,
+  mascotaPorSlug,
+  nombreDueno,
+  fechaLargaDia,
+  fechaConDia,
+} from '../../../data/veterinaria';
+
+const HOY = '2026-04-30';
+const fechaHoy = fechaLargaDia(HOY);
+
+// Próximas visitas (excluyendo hoy)
+const proximas = visitasSemana.filter((v) => v.fecha > HOY);
+const proximasPorFecha = proximas.reduce((acc, v) => {
+  (acc[v.fecha] ||= []).push(v);
+  return acc;
+}, {} as Record<string, typeof proximas>);
+
+const iconoAlerta: Record<string, string> = {
+  'vacuna-vencida': 'M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z',
+  'antiparasitario-pendiente': 'M11 12H3M16 6l5 6-5 6M21 12H8',
+  'stock-bajo': 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16zM3.27 6.96 12 12.01l8.73-5.05M12 22.08V12',
+  'control-vencido': 'M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01',
+};
+---
+
+<DemoVeterinariaLayout
+  title="Dashboard — M. Ángeles Vet"
+  pageTitle="Dashboard"
+>
+  <div class="page-head">
+    <div>
+      <h1>Hola, M. Ángeles 👋</h1>
+      <p class="subtitle">{fechaHoy}</p>
+    </div>
+    <div class="page-head-actions">
+      <a href="/demos/veterinaria/agenda" class="btn-app">Ver agenda completa</a>
+      <a href="#" class="btn-app primary">+ Nueva visita</a>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <section class="kpi-grid">
+    {kpis.map((k) => (
+      <div class="kpi-card">
+        <div class="kpi-label">{k.label}</div>
+        <div class="kpi-value">
+          {k.valor}
+          {k.trend === 'up' && (
+            <span class="kpi-trend up" aria-label="tendencia al alza">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 15 12 9 18 15"/>
+              </svg>
+            </span>
+          )}
+          {k.trend === 'down' && (
+            <span class="kpi-trend down" aria-label="tendencia a la baja">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          )}
+        </div>
+        <div class="kpi-detail">{k.detalle}</div>
+      </div>
+    ))}
+  </section>
+
+  <!-- Visitas hoy + Alertas -->
+  <section class="dash-row">
+    <div class="card dash-visitas">
+      <div class="card-head">
+        <h2 class="card-title">Visitas de hoy</h2>
+        <a href="/demos/veterinaria/agenda" class="card-link">Ver agenda →</a>
+      </div>
+      <ul class="visitas-list" role="list">
+        {visitasHoy.map((v) => {
+          const dueno = duenoPorId(v.duenoId)!;
+          const mascotas = v.mascotaSlugs.map((s) => mascotaPorSlug(s)!);
+          const especiePrincipal = mascotas[0].especie;
+          return (
+            <li class={`visita-row visita-${v.estado}`}>
+              <span class="visita-hora">{v.hora}</span>
+              <div class="visita-avatar">
+                <AvatarMascota especie={especiePrincipal} nombre={mascotas[0].nombre} size="sm" />
+                {mascotas.length > 1 && <span class="visita-mas">+{mascotas.length - 1}</span>}
+              </div>
+              <div class="visita-info">
+                <span class="visita-dueno">
+                  {nombreDueno(dueno)}
+                  <span class="visita-mascotas">
+                    {' · '}{mascotas.map((m) => m.nombre).join(' + ')}
+                  </span>
+                </span>
+                <span class="visita-direccion">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  {dueno.direccion} · {dueno.zona}
+                </span>
+                <span class="visita-procedimiento">{v.procedimiento}</span>
+                {v.notas && <span class="visita-nota">⚠ {v.notas}</span>}
+              </div>
+              <span class={`pill pill-${v.estado === 'finalizado' ? 'finalizado' : v.estado === 'en-curso' ? 'en-sala' : 'confirmado'}`}>
+                {v.estado === 'en-curso' ? 'En curso' : v.estado === 'finalizado' ? 'Hecho' : 'Confirmada'}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+
+    <div class="card dash-alertas">
+      <div class="card-head">
+        <h2 class="card-title">Alertas</h2>
+        <span class="card-link">{alertas.length} sin leer</span>
+      </div>
+      <ul class="alertas-list" role="list">
+        {alertas.map((a) => (
+          <li class={`alerta alerta-${a.tipo}`}>
+            <span class="alerta-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d={iconoAlerta[a.tipo]} />
+              </svg>
+            </span>
+            <div>
+              <span class="alerta-text">{a.texto}</span>
+              {a.detalle && <span class="alerta-detalle">{a.detalle}</span>}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Próximas visitas -->
+  <section class="card dash-proximos">
+    <div class="card-head">
+      <h2 class="card-title">Próximas visitas</h2>
+      <a href="/demos/veterinaria/agenda" class="card-link">Ver semana →</a>
+    </div>
+    <div class="proximos-grid">
+      {Object.entries(proximasPorFecha).map(([fecha, lista]) => (
+        <div class="proximo-dia">
+          <div class="proximo-dia-head">
+            <span class="proximo-dia-fecha">{fechaConDia(fecha)}</span>
+            <span class="proximo-dia-count">{lista.length} visita{lista.length !== 1 ? 's' : ''}</span>
+          </div>
+          <ul class="proximo-list" role="list">
+            {lista.map((v) => {
+              const dueno = duenoPorId(v.duenoId)!;
+              const mascotas = v.mascotaSlugs.map((s) => mascotaPorSlug(s)!);
+              return (
+                <li>
+                  <span class="proximo-hora">{v.hora}</span>
+                  <span class="proximo-dueno">
+                    {nombreDueno(dueno)}
+                    {mascotas.length > 1 && <span class="proximo-multi">·{mascotas.length}🐾</span>}
+                  </span>
+                  <span class="proximo-mascotas">
+                    {mascotas.map((m) => m.nombre).join(' + ')}
+                  </span>
+                  <span class="proximo-zona">{dueno.zona}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+</DemoVeterinariaLayout>
+
+<style>
+  /* KPI grid */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .kpi-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    transition: all var(--transition);
+  }
+
+  .kpi-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+  }
+
+  .kpi-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+  }
+
+  .kpi-value {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .kpi-trend {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .kpi-trend.up { background: rgba(40, 130, 70, 0.12); color: #2D7A48; }
+  .kpi-trend.down { background: rgba(217, 80, 80, 0.12); color: #B23A3A; }
+
+  .kpi-detail {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  /* Row visitas + alertas */
+  .dash-row {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Visitas hoy */
+  .visitas-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .visita-row {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    gap: 0.85rem;
+    align-items: start;
+    padding: 0.95rem 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .visita-row:first-child { border-top: none; }
+
+  .visita-finalizado { opacity: 0.55; }
+
+  .visita-en-curso {
+    background: linear-gradient(90deg, rgba(184, 83, 15, 0.06), transparent 70%);
+    border-radius: 6px;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    margin: 0 -0.75rem;
+  }
+
+  .visita-hora {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 50px;
+    padding-top: 0.6rem;
+  }
+
+  .visita-avatar {
+    position: relative;
+  }
+
+  .visita-mas {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.05rem 0.3rem;
+    border-radius: 999px;
+    border: 2px solid var(--bg-panel);
+    line-height: 1;
+  }
+
+  .visita-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .visita-dueno {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+
+  .visita-mascotas {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .visita-direccion {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .visita-direccion svg { color: var(--accent); flex-shrink: 0; }
+
+  .visita-procedimiento {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.1rem;
+  }
+
+  .visita-nota {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+  }
+
+  /* Alertas */
+  .alertas-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .alerta {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: var(--bg);
+    border-left: 3px solid var(--text-muted);
+  }
+
+  .alerta div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .alerta-vacuna-vencida { border-left-color: #B23A3A; }
+  .alerta-antiparasitario-pendiente { border-left-color: var(--accent); }
+  .alerta-stock-bajo { border-left-color: #D4A82A; }
+  .alerta-control-vencido { border-left-color: var(--text-secondary); }
+
+  .alerta-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .alerta-vacuna-vencida .alerta-icon { color: #B23A3A; }
+  .alerta-antiparasitario-pendiente .alerta-icon { color: var(--accent); }
+  .alerta-stock-bajo .alerta-icon { color: #D4A82A; }
+
+  .alerta-text {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  .alerta-detalle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* Próximas visitas */
+  .dash-proximos { padding-bottom: 0.5rem; }
+
+  .proximos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .proximo-dia {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    background: var(--bg);
+  }
+
+  .proximo-dia-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+  }
+
+  .proximo-dia-fecha {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+  }
+
+  .proximo-dia-count {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.03em;
+  }
+
+  .proximo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .proximo-list li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto auto;
+    column-gap: 0.6rem;
+    row-gap: 0.1rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .proximo-list li:last-child { border-bottom: none; }
+
+  .proximo-hora {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent);
+    grid-row: 1 / 4;
+    align-self: start;
+    padding-top: 0.1rem;
+  }
+
+  .proximo-dueno {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+
+  .proximo-multi {
+    margin-left: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+
+  .proximo-mascotas {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+  }
+
+  .proximo-zona {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .dash-row { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    .visita-row {
+      grid-template-columns: auto 1fr;
+      grid-template-rows: auto auto;
+    }
+    .visita-row .visita-hora { grid-row: 1; }
+    .visita-row .visita-avatar { grid-row: 2; grid-column: 1; }
+    .visita-row .visita-info { grid-column: 1 / -1; grid-row: 3; }
+    .visita-row .pill { grid-row: 1; grid-column: 2; justify-self: end; }
+    .kpi-value { font-size: 1.55rem; }
+  }
+</style>
