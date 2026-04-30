@@ -1,0 +1,349 @@
+---
+import BookingLayout from '../../../../../layouts/BookingLayout.astro';
+import StepIndicator from '../../../../../components/demo-consultorio/booking/StepIndicator.astro';
+
+// Próximos 14 días desde hoy (jue 30 abr 2026). Hardcoded para evitar timezone issues.
+type Dia = { iso: string; numero: number; nombre: string; mes: string; status: 'pasado' | 'cerrado' | 'completo' | 'disponible'; etiqueta?: string };
+
+const dias: Dia[] = [
+  { iso: '2026-05-01', numero: 1, nombre: 'Vie', mes: 'may', status: 'cerrado', etiqueta: 'feriado' },
+  { iso: '2026-05-02', numero: 2, nombre: 'Sáb', mes: 'may', status: 'completo' },
+  { iso: '2026-05-03', numero: 3, nombre: 'Dom', mes: 'may', status: 'cerrado' },
+  { iso: '2026-05-04', numero: 4, nombre: 'Lun', mes: 'may', status: 'disponible' },
+  { iso: '2026-05-05', numero: 5, nombre: 'Mar', mes: 'may', status: 'disponible' },
+  { iso: '2026-05-06', numero: 6, nombre: 'Mié', mes: 'may', status: 'disponible' },
+  { iso: '2026-05-07', numero: 7, nombre: 'Jue', mes: 'may', status: 'disponible' },
+  { iso: '2026-05-08', numero: 8, nombre: 'Vie', mes: 'may', status: 'disponible' },
+  { iso: '2026-05-09', numero: 9, nombre: 'Sáb', mes: 'may', status: 'disponible' },
+  { iso: '2026-05-10', numero: 10, nombre: 'Dom', mes: 'may', status: 'cerrado' },
+  { iso: '2026-05-11', numero: 11, nombre: 'Lun', mes: 'may', status: 'disponible' },
+  { iso: '2026-05-12', numero: 12, nombre: 'Mar', mes: 'may', status: 'disponible' },
+  { iso: '2026-05-13', numero: 13, nombre: 'Mié', mes: 'may', status: 'disponible' },
+  { iso: '2026-05-14', numero: 14, nombre: 'Jue', mes: 'may', status: 'disponible' },
+];
+
+// Slots de 30min para mañana y tarde
+const slotsManana = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30'];
+const slotsTarde = ['16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30'];
+
+// Slots ocupados para el día seleccionado por defecto (martes 5 may)
+const ocupadosDefault = new Set(['09:00', '11:00', '12:00', '16:00', '17:30']);
+const slotPreSelected = '10:30';
+
+const formatDiaLargo = (d: Dia) => `${d.nombre} ${d.numero} de mayo`;
+---
+
+<BookingLayout title="Elegí horario — Ache Odontología">
+  <a href="/demos/consultorio/reservar/" class="booking-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+    </svg>
+    Volver
+  </a>
+
+  <StepIndicator step={2} />
+
+  <h1 class="booking-title">Elegí día y hora</h1>
+  <p class="booking-subtitle">Seleccioná un día y luego un horario disponible para tu primera consulta.</p>
+
+  <!-- Day strip -->
+  <div class="day-strip-wrap">
+    <div class="day-strip" id="day-strip" role="listbox" aria-label="Elegí un día">
+      {dias.map((d) => (
+        <button
+          type="button"
+          class={`day-chip day-${d.status} ${d.iso === '2026-05-05' ? 'selected' : ''}`}
+          data-iso={d.iso}
+          data-day={formatDiaLargo(d)}
+          disabled={d.status === 'cerrado' || d.status === 'completo' || d.status === 'pasado'}
+          aria-pressed={d.iso === '2026-05-05' ? 'true' : 'false'}
+        >
+          <span class="day-name">{d.nombre}</span>
+          <span class="day-num">{d.numero}</span>
+          <span class="day-mes">{d.mes}</span>
+          {d.etiqueta && <span class="day-label">{d.etiqueta}</span>}
+          {d.status === 'completo' && <span class="day-label">completo</span>}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div class="booking-card">
+    <div class="slot-section-head">
+      <h2 class="slot-section-title">Horarios para <span id="day-readout">Martes 5 de mayo</span></h2>
+      <span class="slot-leyenda">
+        <span class="slot-leyenda-dot disponible"></span> Disponible
+        <span class="slot-leyenda-dot ocupado"></span> Ocupado
+      </span>
+    </div>
+
+    <p class="slot-period-label">Mañana</p>
+    <div class="slot-grid">
+      {slotsManana.map((s) => (
+        <button
+          type="button"
+          class={`slot ${ocupadosDefault.has(s) ? 'ocupado' : 'disponible'} ${s === slotPreSelected ? 'selected' : ''}`}
+          data-time={s}
+          disabled={ocupadosDefault.has(s)}
+          aria-pressed={s === slotPreSelected ? 'true' : 'false'}
+        >
+          {s}
+        </button>
+      ))}
+    </div>
+
+    <p class="slot-period-label">Tarde</p>
+    <div class="slot-grid">
+      {slotsTarde.map((s) => (
+        <button
+          type="button"
+          class={`slot ${ocupadosDefault.has(s) ? 'ocupado' : 'disponible'}`}
+          data-time={s}
+          disabled={ocupadosDefault.has(s)}
+        >
+          {s}
+        </button>
+      ))}
+    </div>
+
+    <div class="rule-line">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <span>Mínimo 24hs de anticipación. Para urgencias del día, llamanos.</span>
+    </div>
+  </div>
+
+  <div class="booking-nav">
+    <a href="/demos/consultorio/reservar/" class="booking-back">← Volver</a>
+    <a href="/demos/consultorio/reservar/pago/" class="booking-cta">
+      Continuar al pago
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </a>
+  </div>
+
+  <script>
+    // Selección visual de día
+    const dayChips = document.querySelectorAll<HTMLButtonElement>('.day-chip');
+    const readout = document.getElementById('day-readout');
+    dayChips.forEach((c) => {
+      c.addEventListener('click', () => {
+        if (c.disabled) return;
+        dayChips.forEach((x) => { x.classList.remove('selected'); x.setAttribute('aria-pressed', 'false'); });
+        c.classList.add('selected');
+        c.setAttribute('aria-pressed', 'true');
+        if (readout && c.dataset.day) readout.textContent = c.dataset.day;
+      });
+    });
+
+    // Selección visual de slot
+    const slots = document.querySelectorAll<HTMLButtonElement>('.slot');
+    slots.forEach((s) => {
+      s.addEventListener('click', () => {
+        if (s.disabled) return;
+        slots.forEach((x) => { x.classList.remove('selected'); x.setAttribute('aria-pressed', 'false'); });
+        s.classList.add('selected');
+        s.setAttribute('aria-pressed', 'true');
+      });
+    });
+
+  </script>
+</BookingLayout>
+
+<style>
+  .day-strip-wrap {
+    margin-bottom: 1.25rem;
+    overflow-x: auto;
+    margin-left: -1.25rem;
+    margin-right: -1.25rem;
+    padding: 0 1.25rem;
+  }
+
+  .day-strip {
+    display: flex;
+    gap: 0.5rem;
+    min-width: max-content;
+  }
+
+  .day-chip {
+    flex-shrink: 0;
+    width: 64px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 0.5rem 0.55rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.05rem;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: inherit;
+    color: var(--text-primary);
+  }
+
+  .day-chip:hover:not(:disabled) {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .day-chip.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .day-chip:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--bg);
+  }
+
+  .day-name {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .day-chip.selected .day-name { color: rgba(245, 239, 230, 0.7); }
+
+  .day-num {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin: 0.15rem 0;
+  }
+
+  .day-chip.selected .day-num { color: var(--bg); }
+
+  .day-mes {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .day-chip.selected .day-mes { color: rgba(245, 239, 230, 0.7); }
+
+  .day-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-top: 0.2rem;
+  }
+
+  /* Section title */
+  .slot-section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .slot-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .slot-section-title span {
+    color: var(--accent);
+  }
+
+  .slot-leyenda {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .slot-leyenda-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.15rem;
+    margin-left: 0.4rem;
+  }
+
+  .slot-leyenda-dot:first-child { margin-left: 0; }
+  .slot-leyenda-dot.disponible { background: var(--accent); }
+  .slot-leyenda-dot.ocupado { background: var(--text-muted); opacity: 0.4; }
+
+  .slot-period-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .slot-period-label:first-of-type { margin-top: 0; }
+
+  .slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    gap: 0.4rem;
+  }
+
+  .slot {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.55rem 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .slot:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .slot.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .slot.ocupado {
+    background: var(--bg);
+    color: var(--text-muted);
+    text-decoration: line-through;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .rule-line {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .rule-line svg { color: var(--accent); flex-shrink: 0; }
+</style>

@@ -1,0 +1,254 @@
+---
+import BookingLayout from '../../../../../layouts/BookingLayout.astro';
+import StepIndicator from '../../../../../components/demo-consultorio/booking/StepIndicator.astro';
+---
+
+<BookingLayout title="Pago de seña — Ache Odontología">
+  <a href="/demos/consultorio/reservar/horario/" class="booking-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+    </svg>
+    Volver
+  </a>
+
+  <StepIndicator step={3} />
+
+  <h1 class="booking-title">Pago de la seña</h1>
+  <p class="booking-subtitle">Para confirmar tu primera consulta abonás <strong>$6.000</strong>. La seña se descuenta del valor total de la atención.</p>
+
+  <!-- Resumen del turno -->
+  <div class="booking-card pago-resumen">
+    <h2 class="pago-resumen-title">Tu turno</h2>
+    <ul class="pago-resumen-list">
+      <li>
+        <span class="pr-label">Día y hora</span>
+        <span class="pr-value">Martes 5 de mayo · 10:30 hs</span>
+      </li>
+      <li>
+        <span class="pr-label">Profesional</span>
+        <span class="pr-value">Dra. Mercedes Ache</span>
+      </li>
+      <li>
+        <span class="pr-label">Tipo</span>
+        <span class="pr-value">Primera consulta</span>
+      </li>
+      <li>
+        <span class="pr-label">Lugar</span>
+        <span class="pr-value">20 de Septiembre 587, MdP</span>
+      </li>
+    </ul>
+    <div class="pago-resumen-total">
+      <span>Seña a pagar</span>
+      <strong>$6.000</strong>
+    </div>
+  </div>
+
+  <!-- Mock de pago -->
+  <form class="booking-card pago-form" id="pago-form">
+    <h2 class="pago-form-title">Datos de pago</h2>
+
+    <div class="metodo-pago" role="radiogroup" aria-label="Método de pago">
+      <label class="metodo-opt selected">
+        <input type="radio" name="metodo" value="tarjeta" checked />
+        <span class="metodo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+        </span>
+        <span class="metodo-text">Tarjeta de crédito o débito</span>
+      </label>
+      <label class="metodo-opt">
+        <input type="radio" name="metodo" value="mp" />
+        <span class="metodo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>
+          </svg>
+        </span>
+        <span class="metodo-text">Mercado Pago</span>
+      </label>
+    </div>
+
+    <div class="booking-field">
+      <label for="card-num">Número de tarjeta</label>
+      <input type="text" id="card-num" placeholder="•••• •••• •••• 4242" inputmode="numeric" autocomplete="cc-number" />
+    </div>
+
+    <div class="booking-field-row">
+      <div class="booking-field">
+        <label for="card-exp">Vencimiento</label>
+        <input type="text" id="card-exp" placeholder="MM/AA" inputmode="numeric" autocomplete="cc-exp" />
+      </div>
+      <div class="booking-field">
+        <label for="card-cvv">CVV</label>
+        <input type="text" id="card-cvv" placeholder="•••" inputmode="numeric" autocomplete="cc-csc" />
+      </div>
+    </div>
+
+    <div class="booking-field">
+      <label for="card-name">Nombre como figura en la tarjeta</label>
+      <input type="text" id="card-name" placeholder="LAUTARO GOMEZ" autocomplete="cc-name" />
+    </div>
+
+    <p class="pago-secure">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Procesamiento seguro mediante Mercado Pago. No guardamos los datos de tu tarjeta.
+    </p>
+
+    <div class="booking-nav">
+      <a href="/demos/consultorio/reservar/horario/" class="booking-back">← Cambiar horario</a>
+      <button type="submit" class="booking-cta">
+        Pagar $6.000 y confirmar
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </button>
+    </div>
+  </form>
+
+  <script>
+    // Toggle visual de método
+    const metodoOpts = document.querySelectorAll<HTMLLabelElement>('.metodo-opt');
+    metodoOpts.forEach((m) => {
+      m.addEventListener('click', () => {
+        metodoOpts.forEach((x) => x.classList.remove('selected'));
+        m.classList.add('selected');
+      });
+    });
+
+    document.getElementById('pago-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      window.location.href = '/demos/consultorio/reservar/confirmacion/';
+    });
+  </script>
+</BookingLayout>
+
+<style>
+  .pago-resumen-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1rem;
+  }
+
+  .pago-resumen-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .pago-resumen-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    font-size: 0.88rem;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 0.5rem;
+  }
+
+  .pago-resumen-list li:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .pr-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .pr-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .pago-resumen-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    background: var(--accent-dim);
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .pago-resumen-total strong {
+    color: var(--accent);
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .pago-form-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1rem;
+  }
+
+  .metodo-pago {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .metodo-opt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    background: var(--bg);
+    transition: all var(--transition);
+    font-size: 0.82rem;
+  }
+
+  .metodo-opt input { display: none; }
+
+  .metodo-opt.selected {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .metodo-icon {
+    color: var(--text-muted);
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .metodo-opt.selected .metodo-icon { color: var(--accent); }
+
+  .pago-secure {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+    padding: 0.65rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    border-top: 1px dashed var(--border);
+  }
+
+  .pago-secure svg {
+    color: #2D7A48;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 480px) {
+    .metodo-pago { grid-template-columns: 1fr; }
+    .pr-value { text-align: left; }
+    .pago-resumen-list li { flex-direction: column; gap: 0.15rem; align-items: flex-start; }
+  }
+</style>

@@ -1,0 +1,34 @@
+---
+// Indica el paso actual del flujo de booking (4 pasos: Datos · Horario · Pago · Listo).
+
+export interface Props {
+  step: number; // 1..4
+}
+
+const { step } = Astro.props;
+
+const steps = ['Datos', 'Horario', 'Pago', 'Listo'];
+
+const track = steps.map((label, i) => ({
+  label,
+  num: i + 1,
+  done: i + 1 < step,
+  isCurrent: i + 1 === step,
+}));
+---
+
+<div class="step-bar">
+  <div class="step-bar-track">
+    {track.map((s, i) => (
+      <>
+        <span class={`step-dot ${s.done ? 'done' : ''} ${s.isCurrent ? 'current' : ''}`}>
+          {s.done ? '✓' : s.num}
+        </span>
+        {s.isCurrent && <span class="step-label">{s.label}</span>}
+        {i < track.length - 1 && (
+          <span class={`step-line ${s.done ? 'done' : ''}`}></span>
+        )}
+      </>
+    ))}
+  </div>
+</div>

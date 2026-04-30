@@ -1,0 +1,421 @@
+---
+import DemoConsultorioLayout from '../../../../layouts/DemoConsultorioLayout.astro';
+import { pacientes, iniciales, nombreCompleto } from '../../../../data/consultorio';
+
+const fechaCorta = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  return `${d} ${meses[m - 1]} ${y}`;
+};
+
+const totalActivos = pacientes.filter((p) => p.estado === 'activo').length;
+const totalConTurno = pacientes.filter((p) => new Date(p.proximoControl) >= new Date('2026-04-30') && new Date(p.proximoControl) <= new Date('2026-05-31')).length;
+const totalConTratamiento = pacientes.filter((p) => p.tratamientos.some((t) => t.estado === 'en-curso')).length;
+---
+
+<DemoConsultorioLayout
+  title="Pacientes — Ache Odontología"
+  pageTitle="Pacientes"
+  searchPlaceholder="Buscar paciente por nombre, DNI…"
+>
+  <div class="page-head">
+    <div>
+      <h1>Pacientes</h1>
+      <p class="subtitle">{pacientes.length} fichas · {totalActivos} activas</p>
+    </div>
+    <div class="page-head-actions">
+      <a href="#" class="btn-app">Exportar</a>
+      <a href="#" class="btn-app primary">+ Nuevo paciente</a>
+    </div>
+  </div>
+
+  <div class="filters-bar">
+    <div class="filter-search">
+      <span class="filter-search-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </span>
+      <input
+        type="search"
+        id="paciente-search"
+        placeholder="Buscar por nombre, apellido, DNI o email…"
+        autocomplete="off"
+      />
+    </div>
+    <div class="filter-pills" role="tablist" aria-label="Filtrar pacientes">
+      <button type="button" class="filter-pill active" data-filter="todos">Todos <span class="filter-count">{pacientes.length}</span></button>
+      <button type="button" class="filter-pill" data-filter="con-turno">Con turno próximo <span class="filter-count">{totalConTurno}</span></button>
+      <button type="button" class="filter-pill" data-filter="con-tratamiento">Con tratamiento activo <span class="filter-count">{totalConTratamiento}</span></button>
+      <button type="button" class="filter-pill" data-filter="inactivos">Inactivos <span class="filter-count">{pacientes.length - totalActivos}</span></button>
+    </div>
+  </div>
+
+  <div class="card pacientes-card">
+    <table class="pacientes-table">
+      <thead>
+        <tr>
+          <th class="col-paciente">Paciente</th>
+          <th>Edad</th>
+          <th>Obra social</th>
+          <th>Último turno</th>
+          <th>Próximo control</th>
+          <th>Estado</th>
+          <th aria-label="Acciones"></th>
+        </tr>
+      </thead>
+      <tbody id="pacientes-tbody">
+        {pacientes.map((p) => {
+          const tieneTratamientoActivo = p.tratamientos.some((t) => t.estado === 'en-curso');
+          const proximoControlFecha = new Date(p.proximoControl);
+          const tieneTurnoProximo = proximoControlFecha >= new Date('2026-04-30') && proximoControlFecha <= new Date('2026-05-31');
+          const tags = [
+            'todos',
+            p.estado === 'inactivo' ? 'inactivos' : '',
+            tieneTurnoProximo ? 'con-turno' : '',
+            tieneTratamientoActivo ? 'con-tratamiento' : '',
+          ].filter(Boolean).join(' ');
+
+          return (
+            <tr
+              class="paciente-row"
+              data-tags={tags}
+              data-search={`${nombreCompleto(p)} ${p.dni} ${p.email}`.toLowerCase()}
+              onclick={`window.location.href='/demos/consultorio/pacientes/${p.slug}'`}
+            >
+              <td class="col-paciente">
+                <div class="paciente-info">
+                  <span class="paciente-avatar">{iniciales(p)}</span>
+                  <div class="paciente-meta">
+                    <a href={`/demos/consultorio/pacientes/${p.slug}`} class="paciente-name">{nombreCompleto(p)}</a>
+                    <span class="paciente-sub">DNI {p.dni}</span>
+                  </div>
+                </div>
+              </td>
+              <td>{p.edad}</td>
+              <td><span class="paciente-obra">{p.obraSocial}</span></td>
+              <td class="col-fecha">{fechaCorta(p.ultimoTurno)}</td>
+              <td class="col-fecha">{fechaCorta(p.proximoControl)}</td>
+              <td>
+                <span class={`pill pill-${p.estado}`}>{p.estado}</span>
+              </td>
+              <td class="col-action">
+                <a href={`/demos/consultorio/pacientes/${p.slug}`} class="row-arrow" aria-label={`Abrir ficha de ${nombreCompleto(p)}`}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                </a>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+    <div class="pacientes-empty" id="pacientes-empty" hidden>
+      <p>No hay pacientes que coincidan con la búsqueda.</p>
+    </div>
+  </div>
+</DemoConsultorioLayout>
+
+<script>
+  const search = document.getElementById('paciente-search') as HTMLInputElement;
+  const pills = document.querySelectorAll<HTMLButtonElement>('.filter-pill');
+  const rows = document.querySelectorAll<HTMLTableRowElement>('.paciente-row');
+  const empty = document.getElementById('pacientes-empty');
+
+  let activeFilter = 'todos';
+  let activeQuery = '';
+
+  const apply = () => {
+    let visible = 0;
+    rows.forEach((row) => {
+      const tags = row.dataset.tags || '';
+      const haystack = row.dataset.search || '';
+      const matchesFilter = activeFilter === 'todos' || tags.includes(activeFilter);
+      const matchesQuery = !activeQuery || haystack.includes(activeQuery);
+      const show = matchesFilter && matchesQuery;
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    if (empty) empty.hidden = visible !== 0;
+  };
+
+  search?.addEventListener('input', () => {
+    activeQuery = search.value.trim().toLowerCase();
+    apply();
+  });
+
+  pills.forEach((p) => {
+    p.addEventListener('click', () => {
+      pills.forEach((x) => x.classList.remove('active'));
+      p.classList.add('active');
+      activeFilter = p.dataset.filter || 'todos';
+      apply();
+    });
+  });
+</script>
+
+<style>
+  .filters-bar {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: center;
+  }
+
+  .filter-search {
+    position: relative;
+  }
+
+  .filter-search input {
+    width: 100%;
+    padding: 0.65rem 0.9rem 0.65rem 2.4rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-panel);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    transition: all var(--transition);
+  }
+
+  .filter-search input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(184, 83, 15, 0.12);
+  }
+
+  .filter-search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .filter-pills {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.85rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .filter-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .filter-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .filter-count {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    background: var(--bg);
+    color: var(--text-muted);
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+
+  .filter-pill.active .filter-count {
+    background: rgba(245, 239, 230, 0.2);
+    color: var(--bg);
+  }
+
+  /* Tabla */
+  .pacientes-card {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .pacientes-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .pacientes-table thead th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .paciente-row {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background var(--transition);
+  }
+
+  .paciente-row:hover {
+    background: var(--bg);
+  }
+
+  .paciente-row:last-child {
+    border-bottom: none;
+  }
+
+  .pacientes-table td {
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    vertical-align: middle;
+  }
+
+  .col-paciente { width: 280px; }
+  .col-fecha { font-family: var(--font-mono); font-size: 0.82rem; white-space: nowrap; }
+  .col-action { width: 30px; text-align: right; }
+
+  .paciente-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .paciente-avatar {
+    width: 36px;
+    height: 36px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .paciente-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+
+  .paciente-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.92rem;
+  }
+
+  .paciente-name:hover { color: var(--accent); }
+
+  .paciente-sub {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .paciente-obra {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    background: var(--bg);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .row-arrow {
+    color: var(--text-muted);
+    display: inline-flex;
+    transition: all var(--transition);
+  }
+
+  .paciente-row:hover .row-arrow {
+    color: var(--accent);
+    transform: translateX(2px);
+  }
+
+  .pacientes-empty {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+
+  /* Responsive — pasamos a "cards" verticales en mobile */
+  @media (max-width: 900px) {
+    .filters-bar {
+      grid-template-columns: 1fr;
+    }
+    .filter-pills {
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .pacientes-table thead { display: none; }
+    .pacientes-table,
+    .pacientes-table tbody,
+    .pacientes-table tr,
+    .pacientes-table td {
+      display: block;
+      width: 100%;
+    }
+    .paciente-row {
+      padding: 0.85rem 1rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem 1rem;
+      align-items: center;
+    }
+    .pacientes-table td { padding: 0; border: none; }
+    .col-paciente { grid-column: 1 / 2; grid-row: 1 / 2; }
+    .pacientes-table td:nth-child(2),
+    .pacientes-table td:nth-child(3),
+    .pacientes-table td:nth-child(4) { display: none; }
+    .col-fecha:nth-child(5) {
+      grid-column: 1 / 2;
+      grid-row: 2 / 3;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .col-fecha:nth-child(5)::before {
+      content: 'Próximo: ';
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+    }
+    .pacientes-table td:nth-child(6) {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+      justify-self: end;
+    }
+    .col-action {
+      grid-column: 2 / 3;
+      grid-row: 2 / 3;
+      justify-self: end;
+    }
+  }
+</style>

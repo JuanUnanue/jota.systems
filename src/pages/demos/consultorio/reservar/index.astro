@@ -1,0 +1,146 @@
+---
+import BookingLayout from '../../../../layouts/BookingLayout.astro';
+import StepIndicator from '../../../../components/demo-consultorio/booking/StepIndicator.astro';
+---
+
+<BookingLayout title="Reservar primera consulta — Ache Odontología">
+  <StepIndicator step={1} />
+
+  <h1 class="booking-title">Reservá tu primera consulta</h1>
+  <p class="booking-subtitle">
+    Completá tus datos, elegí horario y abonás <strong>$6.000 de seña</strong> para confirmar el turno. La seña se descuenta del valor total de la consulta.
+  </p>
+
+  <div class="recurrente-note">
+    <span class="recurrente-note-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    </span>
+    <div>
+      <strong>¿Ya sos paciente de Ache Odontología?</strong>
+      <span>Coordiná tu próximo turno por teléfono al <a href="tel:+542235551234">+54 9 223 555-1234</a> o por <a href="https://wa.me/5492235551234" target="_blank" rel="noopener">WhatsApp</a>. La reserva online es solo para primeras consultas.</span>
+    </div>
+  </div>
+
+  <form class="booking-card" id="datos-form" novalidate>
+    <h2 class="form-section-title">Tus datos</h2>
+
+    <div class="booking-field-row">
+      <div class="booking-field">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Lautaro" required />
+      </div>
+      <div class="booking-field">
+        <label for="apellido">Apellido</label>
+        <input type="text" id="apellido" name="apellido" placeholder="Gómez" required />
+      </div>
+    </div>
+
+    <div class="booking-field-row">
+      <div class="booking-field">
+        <label for="dni">DNI</label>
+        <input type="text" id="dni" name="dni" placeholder="44.123.456" inputmode="numeric" required />
+      </div>
+      <div class="booking-field">
+        <label for="fechaNac">Fecha de nacimiento</label>
+        <input type="date" id="fechaNac" name="fechaNac" />
+      </div>
+    </div>
+
+    <div class="booking-field-row">
+      <div class="booking-field">
+        <label for="telefono">Teléfono</label>
+        <input type="tel" id="telefono" name="telefono" placeholder="+54 9 223 ..." />
+      </div>
+      <div class="booking-field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="lautaro.g@gmail.com" required />
+      </div>
+    </div>
+
+    <div class="booking-field">
+      <label for="obraSocial">Obra social</label>
+      <select id="obraSocial" name="obraSocial">
+        <option value="">— Seleccioná una —</option>
+        <option>OSDE</option>
+        <option>Swiss Medical</option>
+        <option>Galeno</option>
+        <option>IOMA</option>
+        <option>PAMI</option>
+        <option>Sancor Salud</option>
+        <option>Medifé</option>
+        <option>Particular</option>
+      </select>
+    </div>
+
+    <div class="booking-field">
+      <label for="motivo">Motivo de consulta</label>
+      <textarea id="motivo" name="motivo" placeholder="Contanos brevemente qué necesitás. Ej: dolor en muela inferior derecha, control de rutina, blanqueamiento, etc."></textarea>
+    </div>
+
+    <div class="booking-nav">
+      <a href="/" class="booking-back">← Cancelar</a>
+      <button type="submit" class="booking-cta">
+        Continuar a horario
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </div>
+  </form>
+
+  <script>
+    document.getElementById('datos-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      window.location.href = '/demos/consultorio/reservar/horario/';
+    });
+  </script>
+</BookingLayout>
+
+<style>
+  .recurrente-note {
+    margin-bottom: 1.5rem;
+    padding: 0.85rem 1rem;
+    background: var(--bg-alt);
+    border-left: 3px solid var(--text-muted);
+    border-radius: 0 6px 6px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .recurrente-note-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--bg-panel);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .recurrente-note div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+
+  .recurrente-note strong {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  .form-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1rem;
+  }
+</style>

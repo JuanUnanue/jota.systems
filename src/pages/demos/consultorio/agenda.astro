@@ -1,0 +1,809 @@
+---
+import DemoConsultorioLayout from '../../../layouts/DemoConsultorioLayout.astro';
+import { turnosHoy, proximosTurnos, type Turno, type TipoTurno } from '../../../data/consultorio';
+
+// Hoy: jueves 30 de abril de 2026 → semana 27/04 (lun) al 02/05 (sáb)
+const HOY_ISO = '2026-04-30';
+
+// Turnos de la semana — combinamos los de hoy + próximos + agregamos lunes/martes/miércoles
+// para que la agenda esté llena de manera realista.
+const turnosSemana: Turno[] = [
+  // Lunes 27 abr
+  { id: 'a-1', fecha: '2026-04-27', hora: '09:00', duracionMin: 30, pacienteSlug: 'carla-ruiz', pacienteNombre: 'Carla Ruiz', procedimiento: 'Limpieza', tipo: 'Limpieza', estado: 'finalizado', origen: 'manual' },
+  { id: 'a-2', fecha: '2026-04-27', hora: '10:00', duracionMin: 60, pacienteSlug: 'joaquin-mendez', pacienteNombre: 'Joaquín Méndez', procedimiento: 'Endodoncia 26 — sesión 1', tipo: 'Tratamiento', estado: 'finalizado', origen: 'manual' },
+  { id: 'a-3', fecha: '2026-04-27', hora: '11:30', duracionMin: 45, pacienteSlug: 'federico-castro', pacienteNombre: 'Federico Castro', procedimiento: 'Consulta implante', tipo: 'Cirugía', estado: 'finalizado', origen: 'manual' },
+  { id: 'a-4', fecha: '2026-04-27', hora: '16:30', duracionMin: 60, pacienteSlug: 'lucas-dominguez', pacienteNombre: 'Lucas Domínguez', procedimiento: 'Restauración 17', tipo: 'Tratamiento', estado: 'finalizado', origen: 'manual' },
+  { id: 'a-5', fecha: '2026-04-27', hora: '18:00', duracionMin: 30, pacienteSlug: 'sofia-aguilar', pacienteNombre: 'Sofía Aguilar', procedimiento: 'Control ortodoncia', tipo: 'Ortodoncia', estado: 'finalizado', origen: 'manual' },
+
+  // Martes 28 abr
+  { id: 'b-1', fecha: '2026-04-28', hora: '09:30', duracionMin: 30, pacienteSlug: 'camila-fernandez', pacienteNombre: 'Camila Fernández', procedimiento: 'Limpieza', tipo: 'Limpieza', estado: 'finalizado', origen: 'manual' },
+  { id: 'b-2', fecha: '2026-04-28', hora: '11:00', duracionMin: 30, pacienteSlug: 'tomas-ibarra', pacienteNombre: 'Tomás Ibarra', procedimiento: 'Control prótesis', tipo: 'Control', estado: 'finalizado', origen: 'manual' },
+  { id: 'b-3', fecha: '2026-04-28', hora: '12:00', duracionMin: 45, pacienteSlug: 'martin-rossi', pacienteNombre: 'Martín Rossi', procedimiento: 'Consulta dolor', tipo: 'Urgencia', estado: 'finalizado', origen: 'manual' },
+  { id: 'b-4', fecha: '2026-04-28', hora: '16:00', duracionMin: 30, pacienteSlug: 'valentina-perez', pacienteNombre: 'Valentina Pérez', procedimiento: 'Blanqueamiento s.2', tipo: 'Tratamiento', estado: 'finalizado', origen: 'manual' },
+  { id: 'b-5', fecha: '2026-04-28', hora: '17:00', duracionMin: 60, pacienteSlug: 'laura-gimenez', pacienteNombre: 'Laura Gimenez', procedimiento: 'Blanqueamiento s.2', tipo: 'Tratamiento', estado: 'finalizado', origen: 'manual' },
+  { id: 'b-6', fecha: '2026-04-28', hora: '18:30', duracionMin: 45, pacienteSlug: 'julieta-romero', pacienteNombre: 'Julieta Romero', procedimiento: 'Restauración 46', tipo: 'Tratamiento', estado: 'finalizado', origen: 'manual' },
+
+  // Miércoles 29 abr
+  { id: 'c-1', fecha: '2026-04-29', hora: '09:00', duracionMin: 60, pacienteSlug: 'martin-rossi', pacienteNombre: 'Martín Rossi', procedimiento: 'Extracción 48', tipo: 'Cirugía', estado: 'finalizado', origen: 'manual' },
+  { id: 'c-2', fecha: '2026-04-29', hora: '10:30', duracionMin: 30, pacienteSlug: 'lucas-dominguez', pacienteNombre: 'Lucas Domínguez', procedimiento: 'Limpieza', tipo: 'Limpieza', estado: 'finalizado', origen: 'manual' },
+  { id: 'c-3', fecha: '2026-04-29', hora: '11:30', duracionMin: 60, pacienteSlug: 'tomas-ibarra', pacienteNombre: 'Tomás Ibarra', procedimiento: 'Reajuste prótesis', tipo: 'Control', estado: 'finalizado', origen: 'manual' },
+  { id: 'c-4', fecha: '2026-04-29', hora: '17:00', duracionMin: 30, pacienteSlug: 'camila-fernandez', pacienteNombre: 'Camila Fernández', procedimiento: 'Control', tipo: 'Control', estado: 'finalizado', origen: 'manual' },
+  { id: 'c-5', fecha: '2026-04-29', hora: '18:00', duracionMin: 60, pacienteSlug: 'federico-castro', pacienteNombre: 'Federico Castro', procedimiento: 'Plan de tratamiento', tipo: 'Tratamiento', estado: 'finalizado', origen: 'manual' },
+
+  // Jueves 30 abr (hoy) — los reusamos
+  ...turnosHoy,
+
+  // Viernes 01 may + Sábado 02 may
+  ...proximosTurnos.filter((t) => t.fecha === '2026-05-01' || t.fecha === '2026-05-02'),
+];
+
+// Días de la semana (lunes a sábado)
+const dias = [
+  { iso: '2026-04-27', label: 'Lun 27' },
+  { iso: '2026-04-28', label: 'Mar 28' },
+  { iso: '2026-04-29', label: 'Mié 29' },
+  { iso: '2026-04-30', label: 'Jue 30' },
+  { iso: '2026-05-01', label: 'Vie 01' },
+  { iso: '2026-05-02', label: 'Sáb 02' },
+];
+
+// Slots de 15 min: mañana 9:00 a 13:00 (16 slots), tarde 16:00 a 20:00 (16 slots).
+// Para etiquetas mostramos cada hora completa.
+const SLOTS_MANANA = 16;
+const SLOTS_TARDE = 16;
+const SLOT_HEIGHT = 16; // px por slot de 15min
+
+// Convierte "09:30" a índice dentro del bloque mañana (9:00 = 0)
+const horaToSlotMañana = (hora: string) => {
+  const [h, m] = hora.split(':').map(Number);
+  return (h - 9) * 4 + Math.floor(m / 15);
+};
+const horaToSlotTarde = (hora: string) => {
+  const [h, m] = hora.split(':').map(Number);
+  return (h - 16) * 4 + Math.floor(m / 15);
+};
+
+const esMañana = (hora: string) => Number(hora.split(':')[0]) < 16;
+
+const slotsDur = (min: number) => Math.ceil(min / 15);
+
+// Estilo por tipo de turno
+const colorTipo: Record<TipoTurno, string> = {
+  'Control': 'control',
+  'Limpieza': 'limpieza',
+  'Tratamiento': 'tratamiento',
+  'Urgencia': 'urgencia',
+  'Cirugía': 'cirugia',
+  'Ortodoncia': 'ortodoncia',
+};
+
+// Etiquetas de hora del eje
+const labelsMañana = ['09:00', '10:00', '11:00', '12:00', '13:00'];
+const labelsTarde = ['16:00', '17:00', '18:00', '19:00', '20:00'];
+
+// Stats semanales
+const total = turnosSemana.length;
+const cantPorDia = dias.map((d) => turnosSemana.filter((t) => t.fecha === d.iso).length);
+const finalizadosHoy = turnosSemana.filter((t) => t.fecha === HOY_ISO && t.estado === 'finalizado').length;
+const proximosCount = turnosSemana.filter((t) => t.fecha > HOY_ISO || (t.fecha === HOY_ISO && t.estado === 'confirmado')).length;
+---
+
+<DemoConsultorioLayout
+  title="Agenda — Ache Odontología"
+  pageTitle="Agenda"
+  searchPlaceholder="Buscar paciente o turno…"
+>
+  <div class="page-head">
+    <div>
+      <h1>Agenda semanal</h1>
+      <p class="subtitle">27 abr – 02 may 2026 · {total} turnos · {proximosCount} próximos</p>
+    </div>
+    <div class="page-head-actions">
+      <div class="view-toggle" role="tablist" aria-label="Vista">
+        <button type="button" class="view-btn active">Semana</button>
+        <button type="button" class="view-btn" disabled title="Disponible en producción">Mes</button>
+        <button type="button" class="view-btn" disabled title="Disponible en producción">Día</button>
+      </div>
+      <a href="#" class="btn-app primary">+ Nuevo turno</a>
+    </div>
+  </div>
+
+  <!-- Mini stats por tipo + nav semanal -->
+  <div class="agenda-toolbar">
+    <div class="agenda-nav">
+      <button type="button" class="demo-icon-btn" aria-label="Semana anterior">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="agenda-week-label">Semana del 27 al 02</span>
+      <button type="button" class="demo-icon-btn" aria-label="Próxima semana">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <a href="#" class="agenda-today">Hoy</a>
+    </div>
+
+    <div class="agenda-legend">
+      <span class="leg"><span class="leg-dot leg-control"></span> Control</span>
+      <span class="leg"><span class="leg-dot leg-limpieza"></span> Limpieza</span>
+      <span class="leg"><span class="leg-dot leg-tratamiento"></span> Tratamiento</span>
+      <span class="leg"><span class="leg-dot leg-cirugia"></span> Cirugía</span>
+      <span class="leg"><span class="leg-dot leg-ortodoncia"></span> Ortodoncia</span>
+      <span class="leg"><span class="leg-dot leg-urgencia"></span> Urgencia</span>
+      <span class="leg leg-sep"><span class="leg-mark leg-mark-pago">$</span> Primera consulta online</span>
+    </div>
+  </div>
+
+  <!-- Calendario semanal -->
+  <div class="card calendario">
+    <div class="cal-grid" style={`--slot-h: ${SLOT_HEIGHT}px;`}>
+      <!-- Eje horario -->
+      <div class="cal-axis">
+        <div class="axis-spacer" aria-hidden="true"></div>
+        <div class="axis-block" style={`height:${SLOTS_MANANA * SLOT_HEIGHT}px;`}>
+          {labelsMañana.map((l, i) => (
+            <span class="axis-label" style={`top: ${i * 4 * SLOT_HEIGHT}px;`}>{l}</span>
+          ))}
+        </div>
+        <div class="axis-break" aria-hidden="true">
+          <span>almuerzo</span>
+        </div>
+        <div class="axis-block" style={`height:${SLOTS_TARDE * SLOT_HEIGHT}px;`}>
+          {labelsTarde.map((l, i) => (
+            <span class="axis-label" style={`top: ${i * 4 * SLOT_HEIGHT}px;`}>{l}</span>
+          ))}
+        </div>
+      </div>
+
+      <!-- Días -->
+      {dias.map((d, dIdx) => {
+        const turnosDelDia = turnosSemana.filter((t) => t.fecha === d.iso);
+        const turnosManana = turnosDelDia.filter((t) => esMañana(t.hora));
+        const turnosTarde = turnosDelDia.filter((t) => !esMañana(t.hora));
+        const esHoy = d.iso === HOY_ISO;
+        return (
+          <div class={`cal-col ${esHoy ? 'cal-col-hoy' : ''}`}>
+            <div class="cal-day-head">
+              <span class="cal-day-label">{d.label}</span>
+              <span class="cal-day-count">{turnosDelDia.length}</span>
+            </div>
+
+            <!-- Bloque mañana -->
+            <div class="cal-block" style={`height:${SLOTS_MANANA * SLOT_HEIGHT}px;`}>
+              {[...Array(SLOTS_MANANA)].map((_, i) => (
+                <div class={`cal-slot ${i % 4 === 0 ? 'cal-slot-hour' : ''}`} style={`top:${i * SLOT_HEIGHT}px;`}></div>
+              ))}
+              {turnosManana.map((t) => {
+                const top = horaToSlotMañana(t.hora) * SLOT_HEIGHT;
+                const h = slotsDur(t.duracionMin) * SLOT_HEIGHT;
+                const cls = `cal-event cal-event-${colorTipo[t.tipo]} cal-event-origen-${t.origen} ${t.estado === 'finalizado' ? 'cal-event-done' : ''} ${t.estado === 'en-sala' ? 'cal-event-active' : ''}`;
+                const style = `top:${top}px; height:${h - 2}px;`;
+                const title = `${t.hora} · ${t.pacienteNombre} · ${t.procedimiento}${t.origen === 'online-nuevo' ? ' · primera consulta online + seña' : ''}`;
+                const inner = (
+                  <>
+                    <span class="cal-event-time">{t.hora}</span>
+                    <span class="cal-event-paciente">{t.pacienteNombre}</span>
+                    <span class="cal-event-proc">{t.procedimiento}</span>
+                    {t.origen === 'online-nuevo' && (
+                      <span class="cal-event-mark cal-event-mark-pago" aria-label="Primera consulta online + seña">$</span>
+                    )}
+                  </>
+                );
+                return t.pacienteSlug === '#' ? (
+                  <span class={cls} style={style} title={title}>{inner}</span>
+                ) : (
+                  <a href={`/demos/consultorio/pacientes/${t.pacienteSlug}`} class={cls} style={style} title={title}>{inner}</a>
+                );
+              })}
+            </div>
+
+            <div class="cal-break"></div>
+
+            <!-- Bloque tarde -->
+            <div class="cal-block" style={`height:${SLOTS_TARDE * SLOT_HEIGHT}px;`}>
+              {[...Array(SLOTS_TARDE)].map((_, i) => (
+                <div class={`cal-slot ${i % 4 === 0 ? 'cal-slot-hour' : ''}`} style={`top:${i * SLOT_HEIGHT}px;`}></div>
+              ))}
+              {turnosTarde.map((t) => {
+                const top = horaToSlotTarde(t.hora) * SLOT_HEIGHT;
+                const h = slotsDur(t.duracionMin) * SLOT_HEIGHT;
+                const cls = `cal-event cal-event-${colorTipo[t.tipo]} cal-event-origen-${t.origen} ${t.estado === 'finalizado' ? 'cal-event-done' : ''} ${t.estado === 'en-sala' ? 'cal-event-active' : ''}`;
+                const style = `top:${top}px; height:${h - 2}px;`;
+                const title = `${t.hora} · ${t.pacienteNombre} · ${t.procedimiento}${t.origen === 'online-nuevo' ? ' · primera consulta online + seña' : ''}`;
+                const inner = (
+                  <>
+                    <span class="cal-event-time">{t.hora}</span>
+                    <span class="cal-event-paciente">{t.pacienteNombre}</span>
+                    <span class="cal-event-proc">{t.procedimiento}</span>
+                    {t.origen === 'online-nuevo' && (
+                      <span class="cal-event-mark cal-event-mark-pago" aria-label="Primera consulta online + seña">$</span>
+                    )}
+                  </>
+                );
+                return t.pacienteSlug === '#' ? (
+                  <span class={cls} style={style} title={title}>{inner}</span>
+                ) : (
+                  <a href={`/demos/consultorio/pacientes/${t.pacienteSlug}`} class={cls} style={style} title={title}>{inner}</a>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  <!-- Lista vertical para mobile (alternativa a la grilla) -->
+  <div class="agenda-mobile">
+    {dias.map((d) => {
+      const turnosDia = turnosSemana.filter((t) => t.fecha === d.iso).sort((a, b) => a.hora.localeCompare(b.hora));
+      if (turnosDia.length === 0) return null;
+      return (
+        <div class={`mob-day ${d.iso === HOY_ISO ? 'mob-day-hoy' : ''}`}>
+          <div class="mob-day-head">
+            <span class="mob-day-label">{d.label}</span>
+            <span class="mob-day-count">{turnosDia.length} turnos</span>
+          </div>
+          <ul class="mob-list">
+            {turnosDia.map((t) => (
+              <li>
+                <span class="mob-hora">{t.hora}</span>
+                <span class={`mob-dot mob-dot-${colorTipo[t.tipo]}`}></span>
+                {t.pacienteSlug === '#' ? (
+                  <span class="mob-link mob-link-nuevo">
+                    <span class="mob-paciente">{t.pacienteNombre} <span class="mob-nuevo">nuevo</span></span>
+                    <span class="mob-proc">{t.procedimiento}</span>
+                  </span>
+                ) : (
+                  <a href={`/demos/consultorio/pacientes/${t.pacienteSlug}`} class="mob-link">
+                    <span class="mob-paciente">{t.pacienteNombre}</span>
+                    <span class="mob-proc">{t.procedimiento}</span>
+                  </a>
+                )}
+                {t.origen === 'online-nuevo' && <span class="mob-origen mob-origen-pago" title="Primera consulta online + seña">$</span>}
+                {t.estado === 'finalizado' && <span class="mob-status">✓</span>}
+                {t.estado === 'en-sala' && <span class="pill pill-en-sala">En sala</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    })}
+  </div>
+</DemoConsultorioLayout>
+
+<style>
+  /* Toolbar */
+  .agenda-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .agenda-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .agenda-week-label {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: 0 0.5rem;
+  }
+
+  .agenda-today {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--accent);
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-left: 0.5rem;
+  }
+
+  .agenda-today:hover {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .agenda-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+  }
+
+  .leg {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .leg-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+
+  .leg-sep {
+    border-left: 1px solid var(--border);
+    padding-left: 0.85rem;
+    margin-left: 0.25rem;
+  }
+
+  .leg-mark {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.65rem;
+    border: 1px solid;
+  }
+
+  .leg-mark-pago {
+    background: rgba(40, 130, 70, 0.10);
+    color: #2D7A48;
+    border-color: rgba(40, 130, 70, 0.35);
+  }
+
+  /* View toggle */
+  .view-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bg-panel);
+  }
+
+  .view-btn {
+    padding: 0.55rem 0.85rem;
+    background: transparent;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+    transition: all var(--transition);
+  }
+
+  .view-btn:last-child { border-right: none; }
+  .view-btn:not(:disabled):hover { color: var(--accent); background: var(--accent-dim); }
+  .view-btn.active { background: var(--accent); color: var(--bg); }
+  .view-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Calendario */
+  .calendario {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(6, minmax(0, 1fr));
+  }
+
+  /* Eje horario */
+  .cal-axis {
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .axis-spacer {
+    height: 30px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .axis-block {
+    position: relative;
+  }
+
+  .axis-label {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: right;
+    padding-right: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    transform: translateY(-50%);
+    line-height: 1;
+  }
+
+  .axis-break {
+    height: 28px;
+    background: var(--bg-alt);
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Columna día */
+  .cal-col {
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cal-col:last-child { border-right: none; }
+
+  .cal-col-hoy {
+    background: rgba(184, 83, 15, 0.04);
+  }
+
+  .cal-day-head {
+    height: 30px;
+    padding: 0 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .cal-col-hoy .cal-day-head {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .cal-day-label {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: inherit;
+    letter-spacing: 0.03em;
+  }
+
+  .cal-day-count {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    background: var(--bg-panel);
+    color: var(--text-muted);
+    padding: 0.1rem 0.4rem;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+
+  .cal-col-hoy .cal-day-count {
+    background: rgba(245, 239, 230, 0.25);
+    color: var(--bg);
+  }
+
+  /* Bloques mañana/tarde */
+  .cal-block {
+    position: relative;
+  }
+
+  .cal-slot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--slot-h);
+    border-bottom: 1px dashed transparent;
+  }
+
+  .cal-slot-hour {
+    border-bottom-color: var(--border);
+  }
+
+  .cal-break {
+    height: 28px;
+    background: var(--bg-alt);
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
+  }
+
+  /* Eventos */
+  .cal-event {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    border-radius: 4px;
+    padding: 3px 6px;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--text-primary);
+    background: var(--bg-panel);
+    border: 1px solid var(--accent);
+    border-left: 3px solid var(--accent);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 28px;
+    z-index: 2;
+  }
+
+  .cal-event:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(42, 29, 18, 0.12);
+    z-index: 3;
+  }
+
+  .cal-event-time {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .cal-event-paciente {
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cal-event-proc {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Tipos: borde + tono de fondo sutil */
+  .cal-event-control { border-color: #5C7A3F; border-left-color: #5C7A3F; }
+  .cal-event-limpieza { border-color: #4A6FA5; border-left-color: #4A6FA5; }
+  .cal-event-tratamiento { border-color: var(--accent); border-left-color: var(--accent); background: rgba(184, 83, 15, 0.06); }
+  .cal-event-urgencia { border-color: #B23A3A; border-left-color: #B23A3A; background: rgba(178, 58, 58, 0.06); }
+  .cal-event-cirugia { border-color: #6B3A8A; border-left-color: #6B3A8A; background: rgba(107, 58, 138, 0.06); }
+  .cal-event-ortodoncia { border-color: #C28B2A; border-left-color: #C28B2A; background: rgba(194, 139, 42, 0.06); }
+
+  .leg-control { background: #5C7A3F; }
+  .leg-limpieza { background: #4A6FA5; }
+  .leg-tratamiento { background: var(--accent); }
+  .leg-urgencia { background: #B23A3A; }
+  .leg-cirugia { background: #6B3A8A; }
+  .leg-ortodoncia { background: #C28B2A; }
+
+  .cal-event-done {
+    opacity: 0.55;
+  }
+
+  .cal-event-done .cal-event-paciente {
+    text-decoration: line-through;
+  }
+
+  .cal-event-active {
+    box-shadow: 0 0 0 2px var(--accent);
+    z-index: 3;
+  }
+
+  .cal-event-active::before {
+    content: 'EN SALA';
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  /* Marca de origen en la esquina superior derecha del evento */
+  .cal-event-mark {
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.62rem;
+    line-height: 1;
+    border: 1px solid;
+  }
+
+  .cal-event-mark-pago {
+    background: rgba(40, 130, 70, 0.15);
+    color: #2D7A48;
+    border-color: rgba(40, 130, 70, 0.40);
+  }
+
+  .cal-event-active .cal-event-mark { display: none; }
+
+  .cal-event-origen-online-nuevo {
+    box-shadow: inset 0 -2px 0 rgba(40, 130, 70, 0.4);
+  }
+
+  /* Mobile origen marks */
+  .mob-origen {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.7rem;
+    border: 1px solid;
+    flex-shrink: 0;
+  }
+
+  .mob-origen-pago {
+    background: rgba(40, 130, 70, 0.12);
+    color: #2D7A48;
+    border-color: rgba(40, 130, 70, 0.35);
+  }
+
+  .mob-link-nuevo .mob-paciente {
+    color: var(--accent);
+  }
+
+  .mob-nuevo {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 0.05rem 0.35rem;
+    border-radius: 3px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-left: 0.3rem;
+    vertical-align: middle;
+  }
+
+  /* Versión mobile (lista) */
+  .agenda-mobile {
+    display: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .cal-grid {
+      grid-template-columns: 50px repeat(6, minmax(110px, 1fr));
+      overflow-x: auto;
+    }
+    .calendario {
+      overflow-x: auto;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .calendario { display: none; }
+    .agenda-mobile { display: block; }
+    .agenda-toolbar { gap: 0.75rem; }
+    .agenda-legend { display: none; }
+  }
+
+  /* Mobile list */
+  .mob-day {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .mob-day-hoy {
+    border-color: var(--accent);
+  }
+
+  .mob-day-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+  }
+
+  .mob-day-label {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+
+  .mob-day-hoy .mob-day-label { color: var(--accent); }
+
+  .mob-day-count {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .mob-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .mob-list li {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    gap: 0.6rem;
+    align-items: center;
+    padding: 0.45rem 0;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .mob-list li:last-child { border-bottom: none; }
+
+  .mob-hora {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .mob-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 3px;
+  }
+
+  .mob-dot-control { background: #5C7A3F; }
+  .mob-dot-limpieza { background: #4A6FA5; }
+  .mob-dot-tratamiento { background: var(--accent); }
+  .mob-dot-urgencia { background: #B23A3A; }
+  .mob-dot-cirugia { background: #6B3A8A; }
+  .mob-dot-ortodoncia { background: #C28B2A; }
+
+  .mob-link {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    min-width: 0;
+  }
+
+  .mob-paciente {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    line-height: 1.2;
+  }
+
+  .mob-link:hover .mob-paciente { color: var(--accent); }
+
+  .mob-proc {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.2;
+  }
+
+  .mob-status {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+</style>

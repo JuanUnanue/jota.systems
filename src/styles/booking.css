@@ -1,0 +1,317 @@
+/* =========================================================
+   BOOKING PÚBLICO — Ache Odontología
+   Vista del paciente. Reutiliza variables de global.css.
+   ========================================================= */
+
+.booking-body {
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+/* Banda superior (más sutil que la del sistema interno) */
+.booking-banner {
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+  padding: 0.4rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+.booking-banner a {
+  color: var(--accent);
+  border-bottom: 1px solid var(--border-strong);
+  padding-bottom: 1px;
+}
+
+.booking-banner a:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* Header (logo + dirección) */
+.booking-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-panel);
+  padding: 0.85rem 1.5rem;
+}
+
+.booking-header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.booking-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: right;
+  line-height: 1.4;
+}
+
+.booking-meta strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Main */
+.booking-main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+/* Step indicator */
+.step-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.step-bar-track {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  border: 1.5px solid var(--border-strong);
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+
+.step-dot.done {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.step-dot.current {
+  background: var(--bg-panel);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.step-line {
+  flex: 1;
+  height: 1.5px;
+  background: var(--border);
+  border-radius: 1px;
+}
+
+.step-line.done {
+  background: var(--accent);
+}
+
+.step-label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Page title */
+.booking-title {
+  font-size: clamp(1.5rem, 3vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+  line-height: 1.15;
+}
+
+.booking-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.75rem;
+  line-height: 1.5;
+}
+
+/* Card */
+.booking-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.booking-card + .booking-card { margin-top: 1rem; }
+
+/* Form */
+.booking-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.booking-field label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.booking-field input,
+.booking-field select,
+.booking-field textarea {
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  width: 100%;
+  transition: all var(--transition);
+}
+
+.booking-field input:focus,
+.booking-field select:focus,
+.booking-field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-panel);
+  box-shadow: 0 0 0 3px rgba(184, 83, 15, 0.12);
+}
+
+.booking-field textarea { resize: vertical; min-height: 80px; }
+
+.booking-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.booking-field-row .booking-field { margin-bottom: 0; }
+
+.booking-help {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: -0.25rem 0 1rem;
+}
+
+/* Nav buttons */
+.booking-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.booking-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 0.6rem 0.5rem;
+}
+
+.booking-back:hover { color: var(--accent); }
+
+.booking-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--transition);
+}
+
+.booking-cta:hover {
+  background: var(--accent-hover);
+  color: var(--bg);
+  transform: translateY(-1px);
+}
+
+.booking-cta-secondary {
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.booking-cta-secondary:hover {
+  background: var(--bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Footer */
+.booking-footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 1.25rem 2rem;
+  text-align: center;
+}
+
+.booking-footer-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.booking-footer a {
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-strong);
+  padding-bottom: 1px;
+}
+
+.booking-footer a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.booking-footer-codemar {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border);
+  font-size: 0.7rem;
+}
+
+@media (max-width: 600px) {
+  .booking-field-row { grid-template-columns: 1fr; }
+  .booking-meta { display: none; }
+  .booking-main { padding: 1.5rem 1rem 3rem; }
+  .booking-card { padding: 1.25rem; }
+}

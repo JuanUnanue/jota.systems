@@ -1,0 +1,239 @@
+---
+import BookingLayout from '../../../../../layouts/BookingLayout.astro';
+import StepIndicator from '../../../../../components/demo-consultorio/booking/StepIndicator.astro';
+---
+
+<BookingLayout title="Turno confirmado — Ache Odontología">
+  <StepIndicator step={4} />
+
+  <div class="confirm-hero">
+    <div class="confirm-check">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h1 class="booking-title">¡Listo, tu turno está reservado!</h1>
+    <p class="booking-subtitle">
+      Te enviamos el comprobante por email. Te esperamos.
+    </p>
+  </div>
+
+  <div class="booking-card confirm-card">
+    <h2 class="confirm-section-title">Detalles del turno</h2>
+    <ul class="confirm-list">
+      <li>
+        <span class="cl-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </span>
+        <div>
+          <span class="cl-label">Día y hora</span>
+          <strong>Martes 5 de mayo · 10:30 hs</strong>
+        </div>
+      </li>
+      <li>
+        <span class="cl-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="5"/><path d="M3 21v-1a7 7 0 0 1 14 0v1"/>
+          </svg>
+        </span>
+        <div>
+          <span class="cl-label">Profesional</span>
+          <strong>Dra. Mercedes Ache</strong>
+        </div>
+      </li>
+      <li>
+        <span class="cl-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </span>
+        <div>
+          <span class="cl-label">Lugar</span>
+          <strong>20 de Septiembre 587, Mar del Plata</strong>
+        </div>
+      </li>
+      <li>
+        <span class="cl-icon cl-icon-pago">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </span>
+        <div>
+          <span class="cl-label">Seña pagada</span>
+          <strong>$6.000 · acreditada</strong>
+          <span class="cl-sub">Se descuenta del valor total de la consulta.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="confirm-actions">
+      <a href="#" class="booking-cta-secondary booking-cta">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Agendar en mi calendario
+      </a>
+      <a href="https://wa.me/5492235551234" class="booking-cta-secondary booking-cta" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/>
+        </svg>
+        Compartir por WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <div class="booking-card confirm-tips">
+    <h3>Tips antes de venir</h3>
+    <ul>
+      <li>Llegá 10 minutos antes para que abramos la ficha tranquilos.</li>
+      <li>Traé tu DNI y tu credencial de obra social (si tenés).</li>
+      <li>Si tomás algún medicamento de forma habitual, anotá los nombres antes de venir.</li>
+      <li>¿Tenés que cancelar? Avisanos con al menos 24hs de anticipación.</li>
+    </ul>
+  </div>
+
+  <div class="confirm-foot-link">
+    <a href="/demos/consultorio/reservar/" class="booking-back">← Volver al inicio</a>
+  </div>
+</BookingLayout>
+
+<style>
+  .confirm-hero {
+    text-align: center;
+    margin: 1rem 0 2rem;
+  }
+
+  .confirm-check {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(40, 130, 70, 0.12);
+    color: #2D7A48;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    animation: pop 0.4s cubic-bezier(0.4, 1.4, 0.5, 1) forwards;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .confirm-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1rem;
+  }
+
+  .confirm-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .confirm-list li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.85rem;
+    align-items: flex-start;
+  }
+
+  .cl-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .cl-icon-pago {
+    background: rgba(40, 130, 70, 0.12);
+    color: #2D7A48;
+    border-color: rgba(40, 130, 70, 0.30);
+  }
+
+  .confirm-list div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+
+  .cl-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .confirm-list strong {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .cl-sub {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-top: 0.15rem;
+  }
+
+  .confirm-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .confirm-tips {
+    background: var(--bg);
+  }
+
+  .confirm-tips h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.75rem;
+  }
+
+  .confirm-tips ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .confirm-tips li::before {
+    content: '·';
+    color: var(--accent);
+    font-weight: 700;
+    margin-right: 0.5rem;
+  }
+
+  .confirm-foot-link {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+</style>

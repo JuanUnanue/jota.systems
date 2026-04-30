@@ -1,0 +1,519 @@
+---
+import DemoConsultorioLayout from '../../../../layouts/DemoConsultorioLayout.astro';
+import { pacientes, iniciales, nombreCompleto } from '../../../../data/consultorio';
+
+export async function getStaticPaths() {
+  return pacientes.map((p) => ({
+    params: { slug: p.slug },
+    props: { paciente: p },
+  }));
+}
+
+const { paciente } = Astro.props;
+
+const fechaCorta = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  return `${String(d).padStart(2, '0')} ${meses[m - 1]} ${y}`;
+};
+---
+
+<DemoConsultorioLayout
+  title={`${nombreCompleto(paciente)} — Ache Odontología`}
+  pageTitle="Ficha de paciente"
+  searchPlaceholder="Buscar paciente, presupuesto, turno…"
+>
+  <a href="/demos/consultorio/pacientes" class="back-to-list">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+    </svg>
+    Volver a pacientes
+  </a>
+
+  <!-- Header card -->
+  <section class="paciente-header card">
+    <div class="paciente-id">
+      <span class="paciente-avatar-lg">{iniciales(paciente)}</span>
+      <div class="paciente-id-info">
+        <h1>{nombreCompleto(paciente)}</h1>
+        <div class="paciente-id-meta">
+          <span><strong>{paciente.edad} años</strong></span>
+          <span class="dot">·</span>
+          <span>DNI {paciente.dni}</span>
+          <span class="dot">·</span>
+          <span class={`pill pill-${paciente.estado}`}>{paciente.estado}</span>
+        </div>
+        <div class="paciente-id-contact">
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> {paciente.telefono}</span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> {paciente.email}</span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> {paciente.direccion}</span>
+        </div>
+      </div>
+    </div>
+    <div class="paciente-actions">
+      <span class="obra-tag">{paciente.obraSocial}{paciente.numeroAfiliado ? ` · ${paciente.numeroAfiliado}` : ''}</span>
+      <div class="paciente-cta">
+        <a href="#" class="btn-app">+ Presupuesto</a>
+        <a href="#" class="btn-app primary">+ Nuevo turno</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resumen rápido -->
+  <section class="quick-stats">
+    <div class="stat">
+      <span class="stat-label">Último turno</span>
+      <span class="stat-value">{fechaCorta(paciente.ultimoTurno)}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Próximo control</span>
+      <span class="stat-value">{fechaCorta(paciente.proximoControl)}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Tratamientos en curso</span>
+      <span class="stat-value">{paciente.tratamientos.filter((t) => t.estado === 'en-curso').length}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Primera consulta</span>
+      <span class="stat-value">{fechaCorta(paciente.fechaPrimerConsulta)}</span>
+    </div>
+  </section>
+
+  <!-- Datos personales + observaciones -->
+  <section class="card seccion">
+    <div class="card-head">
+      <h2 class="card-title">Datos personales</h2>
+    </div>
+    <dl class="datos-grid">
+      <div><dt>Dirección</dt><dd>{paciente.direccion}</dd></div>
+      <div><dt>Cumpleaños</dt><dd>{paciente.cumple.replace('-', '/')}</dd></div>
+      <div>
+        <dt>Contacto de emergencia</dt>
+        <dd>{paciente.contactoEmergencia.nombre} <span class="dim">({paciente.contactoEmergencia.relacion})</span><br/><span class="mono">{paciente.contactoEmergencia.telefono}</span></dd>
+      </div>
+      <div>
+        <dt>Alergias</dt>
+        <dd>{paciente.alergias.length === 0 ? <span class="dim">Sin alergias registradas</span> : paciente.alergias.join(', ')}</dd>
+      </div>
+      <div>
+        <dt>Medicación habitual</dt>
+        <dd>{paciente.medicacion.length === 0 ? <span class="dim">No toma medicación regular</span> : paciente.medicacion.join(' · ')}</dd>
+      </div>
+      {paciente.observaciones && (
+        <div class="full">
+          <dt>Observaciones clínicas</dt>
+          <dd class="warn">⚠ {paciente.observaciones}</dd>
+        </div>
+      )}
+    </dl>
+  </section>
+
+  <!-- Historia clínica -->
+  <section class="card seccion">
+    <div class="card-head">
+      <h2 class="card-title">Historia clínica</h2>
+      <a href="#" class="card-link">+ Nueva entrada</a>
+    </div>
+    {paciente.historia.length === 0 ? (
+      <p class="empty">Sin entradas registradas todavía.</p>
+    ) : (
+      <ol class="timeline">
+        {paciente.historia.map((h) => (
+          <li class="timeline-item">
+            <span class="timeline-dot"></span>
+            <div class="timeline-content">
+              <div class="timeline-head">
+                <span class="timeline-fecha">{fechaCorta(h.fecha)}</span>
+                <span class="timeline-prof">{h.profesional}</span>
+              </div>
+              <h3 class="timeline-titulo">{h.titulo}</h3>
+              <p class="timeline-detalle">{h.detalle}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    )}
+  </section>
+
+  <!-- Tratamientos -->
+  <section class="card seccion">
+    <div class="card-head">
+      <h2 class="card-title">Tratamientos en curso</h2>
+      <a href="#" class="card-link">+ Nuevo tratamiento</a>
+    </div>
+    {paciente.tratamientos.length === 0 ? (
+      <p class="empty">No tiene tratamientos activos.</p>
+    ) : (
+      <div class="tratamientos-grid">
+        {paciente.tratamientos.map((t) => (
+          <div class="tratamiento">
+            <div class="tratamiento-head">
+              <h3>{t.nombre}</h3>
+              <span class={`pill pill-${t.estado === 'en-curso' ? 'confirmado' : 'finalizado'}`}>
+                {t.estado === 'en-curso' ? 'En curso' : t.estado === 'pausado' ? 'Pausado' : 'Finalizado'}
+              </span>
+            </div>
+            <p class="tratamiento-meta">Inicio: {fechaCorta(t.inicio)}</p>
+            <div class="tratamiento-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" style={`width:${t.progresoPct}%`}></div>
+              </div>
+              <span class="progress-label">{t.progresoLabel}</span>
+            </div>
+            {t.proximoPaso && <p class="tratamiento-next"><span class="mono">→</span> {t.proximoPaso}</p>}
+          </div>
+        ))}
+      </div>
+    )}
+  </section>
+
+</DemoConsultorioLayout>
+
+<style>
+  .back-to-list {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+  }
+
+  .back-to-list:hover { color: var(--accent); }
+
+  /* Header card */
+  .paciente-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .paciente-id {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .paciente-avatar-lg {
+    width: 72px;
+    height: 72px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .paciente-id-info { min-width: 0; }
+
+  .paciente-id-info h1 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin: 0 0 0.35rem;
+  }
+
+  .paciente-id-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+  }
+
+  .paciente-id-meta .dot { color: var(--text-muted); }
+
+  .paciente-id-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+  }
+
+  .paciente-id-contact span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .paciente-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.85rem;
+  }
+
+  .obra-tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background: var(--bg);
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .paciente-cta {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  /* Quick stats */
+  .quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .stat {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .stat-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  /* Sección genérica */
+  .seccion { margin-bottom: 1rem; }
+
+  /* Datos grid */
+  .datos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem 1.5rem;
+    margin: 0;
+  }
+
+  .datos-grid > div { display: flex; flex-direction: column; gap: 0.25rem; }
+  .datos-grid .full { grid-column: 1 / -1; }
+
+  .datos-grid dt {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+
+  .datos-grid dd {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+
+  .datos-grid dd .dim { color: var(--text-muted); font-style: italic; }
+  .datos-grid dd.warn {
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    border-left: 3px solid var(--accent);
+  }
+
+  /* Timeline historia clínica */
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    padding: 0 0 1.25rem;
+    position: relative;
+  }
+
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--bg-panel);
+    border: 3px solid var(--accent);
+    margin-top: 4px;
+    z-index: 1;
+  }
+
+  .timeline-content { min-width: 0; }
+
+  .timeline-head {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.25rem;
+    flex-wrap: wrap;
+  }
+
+  .timeline-fecha {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .timeline-prof {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+  }
+
+  .timeline-titulo {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem;
+  }
+
+  .timeline-detalle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Tratamientos */
+  .tratamientos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .tratamiento {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .tratamiento-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tratamiento-head h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .tratamiento-meta {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .tratamiento-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+  }
+
+  .progress-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .tratamiento-next {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .tratamiento-next .mono { color: var(--accent); }
+
+  /* Empty state */
+  .empty {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    margin: 0;
+    padding: 1rem 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .paciente-header { flex-direction: column; }
+    .paciente-actions { width: 100%; align-items: flex-start; }
+    .paciente-id-info h1 { font-size: 1.25rem; }
+    .paciente-avatar-lg { width: 56px; height: 56px; font-size: 1.2rem; }
+  }
+</style>

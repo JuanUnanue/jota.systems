@@ -4,6 +4,10 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://codemar.com.ar',
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/demos/'),
+    }),
+  ],
   output: 'static',
 });

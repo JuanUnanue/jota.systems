@@ -1,0 +1,50 @@
+---
+import '../styles/global.css';
+import '../styles/booking.css';
+import DemoLogo from '../components/demo-consultorio/DemoLogo.astro';
+
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#B8530F" />
+  </head>
+  <body class="booking-body">
+    <div class="booking-banner">
+      <span>Esto es una <strong>demo</strong> · sistema diseñado por <a href="/" target="_blank" rel="noopener">CodeMar ↗</a></span>
+    </div>
+
+    <header class="booking-header">
+      <div class="booking-header-inner">
+        <DemoLogo href="/demos/consultorio/reservar" size="md" />
+        <div class="booking-meta">
+          <strong>Dra. Mercedes Ache</strong><br/>
+          20 de Septiembre 587, Mar del Plata · +54 9 223 555-1234
+        </div>
+      </div>
+    </header>
+
+    <main class="booking-main">
+      <slot />
+    </main>
+
+    <footer class="booking-footer">
+      <div class="booking-footer-inner">
+        <span>¿Necesitás ayuda? Llamanos al <a href="tel:+542235551234">+54 9 223 555-1234</a> o escribinos por <a href="https://wa.me/5492235551234" target="_blank" rel="noopener">WhatsApp</a>.</span>
+        <span>Lun a Vie de 9 a 13 y de 16 a 20 · Sáb de 9 a 13.</span>
+        <span class="booking-footer-codemar">Sistema diseñado y desarrollado por <a href="/" target="_blank" rel="noopener">CodeMar ↗</a></span>
+      </div>
+    </footer>
+  </body>
+</html>
