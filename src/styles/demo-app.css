@@ -562,10 +562,24 @@
   .demo-topbar-search {
     display: none;
   }
+
+  /* Tap-friendly: en mobile los CTAs deben respetar 44px mínimo */
+  .btn-app {
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+    min-height: 44px;
+  }
+
+  .demo-icon-btn {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 @media (max-width: 480px) {
   .demo-banner-text { display: none; }
   .demo-content { padding: 1rem 0.85rem; }
   .page-head { flex-direction: column; align-items: flex-start; }
+  .page-head-actions { width: 100%; }
+  .page-head-actions .btn-app { flex: 1; justify-content: center; }
 }

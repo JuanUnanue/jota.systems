@@ -1,0 +1,31 @@
+---
+export interface Props {
+  href: string;
+  mark: string; // 2-3 chars en el cuadradito
+  name: string;
+  sub: string;
+  ariaLabel?: string;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const { href, mark, name, sub, ariaLabel, size = 'md' } = Astro.props;
+
+const sizes = {
+  sm: { mark: 32, name: '0.95rem', sub: '0.6rem' },
+  md: { mark: 38, name: '1rem', sub: '0.65rem' },
+  lg: { mark: 56, name: '1.4rem', sub: '0.75rem' },
+};
+const s = sizes[size];
+const aria = ariaLabel ?? `${name} ${sub} — ir al inicio`;
+---
+
+<a href={href} class="demo-logo-link" aria-label={aria}>
+  <span
+    class="demo-logo-mark"
+    style={`width:${s.mark}px;height:${s.mark}px;font-size:${size === 'lg' ? '1.2rem' : '0.95rem'};`}
+  >{mark}</span>
+  <span class="demo-logo-text">
+    <span class="demo-logo-name" style={`font-size:${s.name}`}>{name}</span>
+    <span class="demo-logo-sub" style={`font-size:${s.sub}`}>{sub}</span>
+  </span>
+</a>

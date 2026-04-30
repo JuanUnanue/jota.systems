@@ -1,0 +1,99 @@
+---
+import '../styles/global.css';
+import '../styles/demo-app.css';
+import DemoBanner from '../components/demo-shell/DemoBanner.astro';
+import DemoSidebar, { type MenuItem, type Brand, type User } from '../components/demo-shell/DemoSidebar.astro';
+import DemoTopbar from '../components/demo-shell/DemoTopbar.astro';
+
+export interface Props {
+  title: string;
+  pageTitle: string;
+  searchPlaceholder?: string;
+  bodyClass?: string;
+  themeColor?: string;
+  brand: Brand;
+  user: User;
+  logoutHref: string;
+  menuItems: MenuItem[];
+  primaryCount?: number;
+  primaryLabel?: string;
+  secondaryLabel?: string;
+}
+
+const {
+  title,
+  pageTitle,
+  searchPlaceholder,
+  bodyClass = '',
+  themeColor = '#B8530F',
+  brand,
+  user,
+  logoutHref,
+  menuItems,
+  primaryCount,
+  primaryLabel,
+  secondaryLabel,
+} = Astro.props;
+
+const current = Astro.url.pathname;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content={themeColor} />
+  </head>
+  <body class={bodyClass}>
+    <div class="demo-app" id="demo-app">
+      <DemoBanner />
+      <DemoSidebar
+        current={current}
+        brand={brand}
+        user={user}
+        logoutHref={logoutHref}
+        menuItems={menuItems}
+        primaryCount={primaryCount}
+        primaryLabel={primaryLabel}
+        secondaryLabel={secondaryLabel}
+      />
+      <main class="demo-main">
+        <DemoTopbar title={pageTitle} searchPlaceholder={searchPlaceholder} />
+        <div class="demo-content">
+          <slot />
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Toggle del sidebar en mobile
+      const app = document.getElementById('demo-app');
+      const toggle = document.getElementById('demo-menu-toggle');
+      const closeMenu = () => app?.classList.remove('menu-open');
+
+      toggle?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        app?.classList.toggle('menu-open');
+      });
+
+      // Cerrar al click en el overlay (zona oscura)
+      document.addEventListener('click', (e) => {
+        if (!app?.classList.contains('menu-open')) return;
+        const target = e.target as HTMLElement;
+        if (target.closest('.demo-sidebar') || target.closest('#demo-menu-toggle')) return;
+        closeMenu();
+      });
+
+      // Cerrar al navegar en mobile
+      document.querySelectorAll<HTMLAnchorElement>('.demo-sidebar a').forEach((a) => {
+        a.addEventListener('click', () => {
+          if (window.innerWidth <= 900) closeMenu();
+        });
+      });
+    </script>
+  </body>
+</html>

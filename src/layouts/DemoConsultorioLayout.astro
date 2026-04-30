@@ -1,68 +1,41 @@
 ---
-import '../styles/global.css';
-import '../styles/demo-consultorio.css';
-import DemoBanner from '../components/demo-consultorio/DemoBanner.astro';
-import DemoSidebar from '../components/demo-consultorio/DemoSidebar.astro';
-import DemoTopbar from '../components/demo-consultorio/DemoTopbar.astro';
+import DemoAppLayout from './DemoAppLayout.astro';
+import { menuItems } from '../data/consultorio';
 
 export interface Props {
   title: string;
-  pageTitle: string; // título mostrado en el topbar
+  pageTitle: string;
   searchPlaceholder?: string;
   bodyClass?: string;
 }
 
-const { title, pageTitle, searchPlaceholder, bodyClass = '' } = Astro.props;
-const current = Astro.url.pathname;
+const { title, pageTitle, searchPlaceholder, bodyClass } = Astro.props;
+
+const brand = {
+  href: '/demos/consultorio/dashboard',
+  mark: 'Ac',
+  name: 'Ache',
+  sub: 'Odontología',
+  ariaLabel: 'Ache Odontología — ir al dashboard',
+};
+
+const user = {
+  initials: 'MA',
+  name: 'Dra. Mercedes Ache',
+  role: 'Profesional',
+};
 ---
 
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>{title}</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#B8530F" />
-  </head>
-  <body class={bodyClass}>
-    <div class="demo-app" id="demo-app">
-      <DemoBanner />
-      <DemoSidebar current={current} />
-      <main class="demo-main">
-        <DemoTopbar title={pageTitle} searchPlaceholder={searchPlaceholder} />
-        <div class="demo-content">
-          <slot />
-        </div>
-      </main>
-    </div>
-
-    <script>
-      // Toggle del sidebar en mobile
-      const app = document.getElementById('demo-app');
-      const toggle = document.getElementById('demo-menu-toggle');
-      const closeMenu = () => app?.classList.remove('menu-open');
-
-      toggle?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        app?.classList.toggle('menu-open');
-      });
-
-      // Cerrar al click en el overlay (zona oscura)
-      document.addEventListener('click', (e) => {
-        if (!app?.classList.contains('menu-open')) return;
-        const target = e.target as HTMLElement;
-        if (target.closest('.demo-sidebar') || target.closest('#demo-menu-toggle')) return;
-        closeMenu();
-      });
-
-      // Cerrar al navegar en mobile
-      document.querySelectorAll<HTMLAnchorElement>('.demo-sidebar a').forEach((a) => {
-        a.addEventListener('click', () => {
-          if (window.innerWidth <= 900) closeMenu();
-        });
-      });
-    </script>
-  </body>
-</html>
+<DemoAppLayout
+  title={title}
+  pageTitle={pageTitle}
+  searchPlaceholder={searchPlaceholder ?? 'Buscar paciente, presupuesto, turno…'}
+  bodyClass={bodyClass}
+  brand={brand}
+  user={user}
+  logoutHref="/demos/consultorio/"
+  menuItems={menuItems}
+  primaryCount={3}
+>
+  <slot />
+</DemoAppLayout>
